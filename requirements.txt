@@ -1,0 +1,6 @@
+EVELink==0.7.4
+pkg-resources==0.0.0
+PyYAML==3.11
+requests==2.10.0
+schedule==0.3.2
+slacker==0.9.24
