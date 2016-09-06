@@ -22,8 +22,8 @@ class SlackNotifier:
             channel = self.default_channel
 
         self.slack.chat.post_message(
-            channel,
-            text_template % text,
-            parse="none",
-            username=self.name
-        )
+                channel,
+                text_template % text,
+                parse="none",
+                username=self.name
+                )
