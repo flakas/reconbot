@@ -24,6 +24,16 @@ class Slack:
             return self.station_conquered(notification)
         if notification['notification_type'] is 93:
             return self.customs_office_attacked(notification)
+        if notification['notification_type'] is 94:
+            return self.customs_office_reinforced(notification)
+        if notification['notification_type'] is 95:
+            return self.structure_transferred(notification)
+        if notification['notification_type'] is 147:
+            return self.entosis_capture_started(notification)
+        if notification['notification_type'] is 148:
+            return self.entosis_enabled_structure(notification)
+        if notification['notification_type'] is 149:
+            return self.entosis_disabled_structure(notification)
         else:
             return 'Unknown notification type for printing'
 
@@ -79,6 +89,46 @@ class Slack:
 
         return "\"%s\" POCO (%d%% shields) has been attacked by %s" % (planet, shields, attacker)
 
+    # 94 - poco reinforced
+    def customs_office_reinforced(self, notification):
+        attacker = self.get_character(notification['aggressorID'])
+        planet = self.get_planet(notification['planetID'])
+        timestamp = self.eve_timestamp_to_date(notification['reinforceExitTime'])
+
+        return "\"%s\" POCO has been reinforced by %s (comes out of reinforce on \"%s\")" % (planet, attacker, timestamp)
+
+    # 95 - structure (not necessarily POCO) transferred
+    def structure_transferred(self, notification):
+        from_corporation = notification['fromCorporationName']
+        to_corporation = notification['toCorporationName']
+        structure = notification['structureName']
+        system = ''
+        if 'solarSystemName' in notification:
+          system = "in " + notification['solarSystemName']
+
+        return "\"%s\" structure %s has been transferred from \"%s\" to \"%s\"" % (structure, system, from_corporation, to_corporation)
+
+    # 147 - entosis capture started
+    def entosis_capture_started(self, notification):
+        system = self.get_system(notification['solarSystemID'])
+        structure = self.get_item(notification['structureTypeID'])
+
+        return "Capturing of \"%s\" in %s has started" % (structure, system)
+
+    # 148 - entosis has enabled structure
+    def entosis_enabled_structure(self, notification):
+        system = self.get_system(notification['solarSystemID'])
+        structure = self.get_item(notification['structureTypeID'])
+
+        return "Structure \"%s\" in %s has been enabled" % (structure, system)
+
+    # 149 - entosis has disabled structure
+    def entosis_disabled_structure(self, notification):
+        system = self.get_system(notification['solarSystemID'])
+        structure = self.get_item(notification['structureTypeID'])
+
+        return "Structure \"%s\" in %s has been disabled" % (structure, system)
+
     def get_corporation(self, corporation_id, alliance_id=None):
         name = self.eve.corporation_id_to_name(corporation_id)
         result = '<https://zkillboard.com/corporation/%d/|%s>' % (corporation_id, name)
@@ -116,3 +166,12 @@ class Slack:
 
     def timestamp_to_date(self, timestamp):
         return datetime.datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
+    def eve_timestamp_to_date(self, microseconds):
+        """
+        Convert microsoft epoch to unix epoch
+        Based on: http://www.wiki.eve-id.net/APIv2_Char_NotificationTexts_XML
+        """
+
+        seconds = microseconds/10000000 - 11644473600
+        return datetime.datetime.utcfromtimestamp(seconds).strftime('%Y-%m-%d %H:%M:%S')

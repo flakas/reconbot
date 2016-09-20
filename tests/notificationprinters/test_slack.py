@@ -21,6 +21,12 @@ class SlackTest(TestCase):
             'alliance_id': 434243723
         }
 
+        self.game_masters_corporation = {
+            'id': 216121397,
+            'name': 'Game Masters',
+            'alliance_id': 434243723
+        }
+
         self.ccp_falcon = {
             'id': 92532650,
             'name': 'CCP Falcon',
@@ -48,6 +54,11 @@ class SlackTest(TestCase):
         self.amarr_control_tower = {
             'id': 12235,
             'name': 'Amarr Control Tower'
+        }
+
+        self.fitting_service = {
+            'id': 28155,
+            'name': 'Fitting Service'
         }
 
         self.eve_mock.alliance_id_to_name.return_value = self.ccp_alliance['name']
@@ -230,4 +241,70 @@ class SlackTest(TestCase):
         self.assertEqual(
             self.printer.get_notification_text(notification),
             '"HED-GP I in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>" POCO (91% shields) has been attacked by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
+        )
+
+    def test_poco_reinforce(self):
+        notification = {
+            'notification_type': 94,
+            'planetID': self.hed_gp_planet['id'],
+            'aggressorID': self.ccp_falcon['id'],
+            'reinforceExitTime': 131189759320000000
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            '"HED-GP I in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>" POCO has been reinforced by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>)) (comes out of reinforce on "2016-09-21 23:58:52")'
+        )
+
+    def test_structure_transfer(self):
+        notification = {
+            'notification_type': 95,
+            'fromCorporationName': self.game_masters_corporation['name'],
+            'toCorporationName': self.ccp_corporation['name'],
+            'structureName': 'HED-GP Freeport Citadel',
+            'solarSystemName': self.hed_gp['name']
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            '"HED-GP Freeport Citadel" structure in HED-GP has been transferred from "Game Masters" to "C C P Alliance Holding"'
+        )
+
+    def test_entosis_capture_started(self):
+        self.eve_mock.get_item_by_id.return_value = self.fitting_service
+        notification = {
+            'notification_type': 147,
+            'solarSystemID': self.hed_gp['id'],
+            'structureTypeID': self.fitting_service['id']
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Capturing of "Fitting Service" in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> has started'
+        )
+
+    def test_entosis_enabled_structure(self):
+        self.eve_mock.get_item_by_id.return_value = self.fitting_service
+        notification = {
+            'notification_type': 148,
+            'solarSystemID': self.hed_gp['id'],
+            'structureTypeID': self.fitting_service['id']
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Structure "Fitting Service" in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> has been enabled'
+        )
+
+    def test_entosis_disabled_structure(self):
+        self.eve_mock.get_item_by_id.return_value = self.fitting_service
+        notification = {
+            'notification_type': 149,
+            'solarSystemID': self.hed_gp['id'],
+            'structureTypeID': self.fitting_service['id']
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Structure "Fitting Service" in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> has been disabled'
         )
