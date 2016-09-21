@@ -304,17 +304,24 @@ class SlackTest(TestCase):
         )
 
     def test_structure_transfer(self):
+        self.eve_mock.corporation_id_to_name.side_effect = lambda ID: self.game_masters_corporation['name'] if ID is self.game_masters_corporation['id'] else self.ccp_corporation['name']
         notification = {
             'notification_type': 95,
             'fromCorporationName': self.game_masters_corporation['name'],
+            'fromCorporationLinkData': ['showinfo', 2, self.game_masters_corporation['id']],
             'toCorporationName': self.ccp_corporation['name'],
+            'toCorporationLinkData': ['showinfo', 2, self.ccp_corporation['id']],
             'structureName': 'HED-GP Freeport Citadel',
-            'solarSystemName': self.hed_gp['name']
+            'structureLinkData': ['showinfo', self.astrahus['id'], 1021121988766],
+            'solarSystemName': self.hed_gp['name'],
+            'solarSystemLinkData': ['showinfo', 5, self.hed_gp['id']],
+            'characterName': self.ccp_falcon['name'],
+            'characterLinkData': ['showinfo', 1377, self.ccp_falcon['id']],
         }
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            '"HED-GP Freeport Citadel" structure in HED-GP has been transferred from "Game Masters" to "C C P Alliance Holding"'
+            '"HED-GP Freeport Citadel" structure in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> has been transferred from <https://zkillboard.com/corporation/216121397/|Game Masters> to <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
         )
 
     def test_entosis_capture_started(self):
@@ -422,7 +429,7 @@ class SlackTest(TestCase):
             'solarsystemID': self.hed_gp['id'],
             'listOfTypesAndQty': [[149, 4247]],
             'structureID': 1021121988766,
-            'structureShowInfoData': ['showinfo', 35832, 1021121988766]
+            'structureShowInfoData': ['showinfo', self.astrahus['id'], 1021121988766]
         }
 
         self.assertEqual(
@@ -439,12 +446,12 @@ class SlackTest(TestCase):
             'ownerCorpName': self.ccp_corporation['name'],
             'ownerCorpLinkData': ['showinfo', 2, self.ccp_corporation['id']],
             'structureID': 1021121988766,
-            'structureShowInfoData': ['showinfo', 35832, 1021121988766]
+            'structureShowInfoData': ['showinfo', self.astrahus['id'], 1021121988766]
         }
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel anchored in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by "C C P Alliance Holding"'
+            'Citadel anchored in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding>'
         )
 
     def test_citadel_attacked(self):
@@ -452,7 +459,7 @@ class SlackTest(TestCase):
             'notification_type': 184,
             'solarsystemID': self.hed_gp['id'],
             'structureID': 1021121988766,
-            'structureShowInfoData': ['showinfo', 35832, 1021121988766],
+            'structureShowInfoData': ['showinfo', self.astrahus['id'], 1021121988766],
             'charID': self.ccp_falcon['id'],
             'allianceName': self.ccp_alliance['name'],
             'shieldPercentage': 5.459048365958682e-13,
@@ -474,7 +481,7 @@ class SlackTest(TestCase):
             'notification_type': 185,
             'solarsystemID': self.hed_gp['id'],
             'structureID': 1021121988766,
-            'structureShowInfoData': ['showinfo', 35832, 1021121988766]
+            'structureShowInfoData': ['showinfo', self.astrahus['id'], 1021121988766]
         }
 
         self.assertEqual(
@@ -489,12 +496,12 @@ class SlackTest(TestCase):
             'structureID': 1021121988766,
             'ownerCorpLinkData': ['showinfo', 2, self.ccp_corporation['id']],
             'ownerCorpName': self.ccp_corporation['name'],
-            'structureShowInfoData': ['showinfo', 35832, 1021911646506]
+            'structureShowInfoData': ['showinfo', self.astrahus['id'], 1021911646506]
         }
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel destroyed in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> owned by "C C P Alliance Holding"'
+            'Citadel destroyed in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> owned by <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding>'
         )
 
     def test_citadel_out_of_fuel(self):
@@ -504,7 +511,7 @@ class SlackTest(TestCase):
             'listOfServiceModuleIDs': [self.standup_cloning_center['id']],
             'solarsystemID': self.hed_gp['id'],
             'structureID': 1021121988766,
-            'structureShowInfoData': ['showinfo', 35832, 1021121988766]
+            'structureShowInfoData': ['showinfo', self.astrahus['id'], 1021121988766]
         }
 
         self.assertEqual(

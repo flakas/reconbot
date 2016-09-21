@@ -119,14 +119,19 @@ class Slack:
 
     # 95 - structure (not necessarily POCO) transferred
     def structure_transferred(self, notification):
-        from_corporation = notification['fromCorporationName']
-        to_corporation = notification['toCorporationName']
+        from_corporation = self.get_corporation(notification['fromCorporationLinkData'][-1])
+        to_corporation = self.get_corporation(notification['toCorporationLinkData'][-1])
         structure = notification['structureName']
-        system = ''
-        if 'solarSystemName' in notification:
-          system = "in " + notification['solarSystemName']
+        system = self.get_system(notification['solarSystemLinkData'][-1])
+        character = self.get_character(notification['characterLinkData'][-1])
 
-        return "\"%s\" structure %s has been transferred from \"%s\" to \"%s\"" % (structure, system, from_corporation, to_corporation)
+        return "\"%s\" structure in %s has been transferred from %s to %s by %s" % (
+            structure,
+            system,
+            from_corporation,
+            to_corporation,
+            character
+        )
 
     # 147 - entosis capture started
     def entosis_capture_started(self, notification):
@@ -188,9 +193,9 @@ class Slack:
     # 182 - Citadel anchoring alert
     def citadel_anchored(self, notification):
         system = self.get_system(notification['solarsystemID'])
-        corp = notification['ownerCorpName']
+        corp = self.get_corporation(notification['ownerCorpLinkData'][-1])
 
-        return "Citadel anchored in %s by \"%s\"" % (system, corp)
+        return "Citadel anchored in %s by %s" % (system, corp)
 
     # 184 - Citadel attacked
     def citadel_attacked(self, notification):
@@ -213,9 +218,9 @@ class Slack:
     # 188 - Citadel destroyed
     def citadel_destroyed(self, notification):
         system = self.get_system(notification['solarsystemID'])
-        corp = notification['ownerCorpName']
+        corp = self.get_corporation(notification['ownerCorpLinkData'][-1])
 
-        return "Citadel destroyed in %s owned by \"%s\"" % (system, corp)
+        return "Citadel destroyed in %s owned by %s" % (system, corp)
 
     # 198 - Citadel ran out of fuel
     def citadel_out_of_fuel(self, notification):
