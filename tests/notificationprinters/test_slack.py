@@ -82,6 +82,11 @@ class SlackTest(TestCase):
             'station': 3
         }
 
+        self.standup_cloning_center = {
+            'id': 35894,
+            'name': 'Standup Cloning Center I'
+        }
+
         self.eve_mock.alliance_id_to_name.return_value = self.ccp_alliance['name']
         self.eve_mock.corporation_id_to_name.return_value = self.ccp_corporation['name']
         self.eve_mock.get_character_by_id.return_value = self.ccp_falcon
@@ -462,4 +467,50 @@ class SlackTest(TestCase):
         self.assertEqual(
             self.printer.get_notification_text(notification),
             'Citadel attacked (0.0% shield, 0.0% armor, 99.8% hull) in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
+        )
+
+    def test_citadel_onlined(self):
+        notification = {
+            'notification_type': 185,
+            'solarsystemID': self.hed_gp['id'],
+            'structureID': 1021121988766,
+            'structureShowInfoData': ['showinfo', 35832, 1021121988766]
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Citadel onlined in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
+        )
+
+    def test_citadel_destroyed(self):
+        notification = {
+            'notification_type': 188,
+            'solarsystemID': self.hed_gp['id'],
+            'structureID': 1021121988766,
+            'ownerCorpLinkData': ['showinfo', 2, self.ccp_corporation['id']],
+            'ownerCorpName': self.ccp_corporation['name'],
+            'structureShowInfoData': ['showinfo', 35832, 1021911646506]
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Citadel destroyed in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> owned by "C C P Alliance Holding"'
+        )
+
+    def test_citadel_out_of_fuel(self):
+        self.eve_mock.get_item_by_id.return_value = self.standup_cloning_center
+        notification = {
+            'notification_type': 198,
+            'listOfServiceModuleIDs': [self.standup_cloning_center['id']],
+            'solarsystemID': self.hed_gp['id'],
+            'structureID': 1021121988766,
+            'structureShowInfoData': ['showinfo', 35832, 1021121988766]
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Citadel ran out of fuel in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> with services "Standup Cloning Center I"'
+        )
+        self.eve_mock.get_item_by_id.assert_called_once_with(
+            self.standup_cloning_center['id']
         )

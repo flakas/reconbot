@@ -48,6 +48,12 @@ class Slack:
             return self.citadel_anchored(notification)
         if notification['notification_type'] is 184:
             return self.citadel_attacked(notification)
+        if notification['notification_type'] is 185:
+            return self.citadel_onlined(notification)
+        if notification['notification_type'] is 188:
+            return self.citadel_destroyed(notification)
+        if notification['notification_type'] is 198:
+            return self.citadel_out_of_fuel(notification)
         else:
             return 'Unknown notification type for printing'
 
@@ -197,6 +203,27 @@ class Slack:
             notification['hullPercentage'],
             system,
             attacker)
+
+    # 185 - Citadel onlined
+    def citadel_onlined(self, notification):
+        system = self.get_system(notification['solarsystemID'])
+
+        return "Citadel onlined in %s" % (system)
+
+    # 188 - Citadel destroyed
+    def citadel_destroyed(self, notification):
+        system = self.get_system(notification['solarsystemID'])
+        corp = notification['ownerCorpName']
+
+        return "Citadel destroyed in %s owned by \"%s\"" % (system, corp)
+
+    # 198 - Citadel ran out of fuel
+    def citadel_out_of_fuel(self, notification):
+        system = self.get_system(notification['solarsystemID'])
+        services = map(lambda ID: self.get_item(ID), notification['listOfServiceModuleIDs'])
+
+        return "Citadel ran out of fuel in %s with services \"%s\"" % (system, ', '.join(services))
+
 
 
     def get_corporation(self, corporation_id, alliance_id=None):
