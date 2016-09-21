@@ -61,6 +61,27 @@ class SlackTest(TestCase):
             'name': 'Fitting Service'
         }
 
+        self.ihub = {
+            'id': 32458,
+            'name': 'Infrastructure Hub'
+        }
+
+        self.station = {
+            'id': 1529,
+            'name': 'Caldari Administrative Station'
+        }
+
+        self.astrahus = {
+            'id': 35832,
+            'name': 'Astrahus'
+        }
+
+        self.campaign_event_types = {
+            'tcu': 1,
+            'ihub': 2,
+            'station': 3
+        }
+
         self.eve_mock.alliance_id_to_name.return_value = self.ccp_alliance['name']
         self.eve_mock.corporation_id_to_name.return_value = self.ccp_corporation['name']
         self.eve_mock.get_character_by_id.return_value = self.ccp_falcon
@@ -149,6 +170,27 @@ class SlackTest(TestCase):
 
         self.eve_mock.get_item_by_id.assert_called_once_with(
             self.amarr_control_tower['id']
+        )
+
+    def test_get_campaign_event_type(self):
+        self.assertEqual(
+            self.printer.get_campaign_event_type(self.campaign_event_types['tcu']),
+            'TCU'
+        )
+
+        self.assertEqual(
+            self.printer.get_campaign_event_type(self.campaign_event_types['ihub']),
+            'IHUB'
+        )
+
+        self.assertEqual(
+            self.printer.get_campaign_event_type(self.campaign_event_types['station']),
+            'Station'
+        )
+
+        self.assertEqual(
+            self.printer.get_campaign_event_type(9999),
+            'Unknown structure type "9999"'
         )
 
     def test_transforms_unknown_notification_type(self):
@@ -307,4 +349,117 @@ class SlackTest(TestCase):
         self.assertEqual(
             self.printer.get_notification_text(notification),
             'Structure "Fitting Service" in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> has been disabled'
+        )
+
+    def test_sov_structure_reinforced(self):
+        notification = {
+            'notification_type': 160,
+            'solarSystemID': self.hed_gp['id'],
+            'campaignEventType': self.campaign_event_types['tcu'],
+            'decloakTime': 131189759320000000
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'SOV structure "TCU" in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> has been reinforced, nodes will decloak "2016-09-21 23:58:52"'
+        )
+
+    def test_sov_structure_command_nodes_decloaked(self):
+        notification = {
+            'notification_type': 161,
+            'solarSystemID': self.hed_gp['id'],
+            'campaignEventType': self.campaign_event_types['tcu'],
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Command nodes for "TCU" SOV structure in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> have decloaked'
+        )
+
+    def test_sov_structure_destroyed(self):
+        self.eve_mock.get_item_by_id.return_value = self.ihub
+        notification = {
+            'notification_type': 162,
+            'solarSystemID': self.hed_gp['id'],
+            'structureTypeID': self.ihub['id']
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'SOV structure "Infrastructure Hub" in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> has been destroyed'
+        )
+
+        self.eve_mock.get_item_by_id.assert_called_once_with(
+            self.ihub['id']
+        )
+
+    def test_sov_structure_freeported(self):
+        self.eve_mock.get_item_by_id.return_value = self.station
+        notification = {
+            'notification_type': 163,
+            'solarSystemID': self.hed_gp['id'],
+            'structureTypeID': self.station['id'],
+            'freeportexittime': 131189759320000000
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'SOV structure "Caldari Administrative Station" in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> has been freeported, exits freeport on "2016-09-21 23:58:52"'
+        )
+
+        self.eve_mock.get_item_by_id.assert_called_once_with(
+            self.station['id']
+        )
+
+    def test_citadel_low_fuel(self):
+        notification = {
+            'notification_type': 181,
+            'solarsystemID': self.hed_gp['id'],
+            'listOfTypesAndQty': [[149, 4247]],
+            'structureID': 1021121988766,
+            'structureShowInfoData': ['showinfo', 35832, 1021121988766]
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Citadel low fuel alert in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
+        )
+
+    def test_citadel_anchored(self):
+        notification = {
+            'notification_type': 182,
+            'solarsystemID': self.hed_gp['id'],
+            'vulnerableTime': 9000000000,
+            'timeLeft': 864000385106,
+            'ownerCorpName': self.ccp_corporation['name'],
+            'ownerCorpLinkData': ['showinfo', 2, self.ccp_corporation['id']],
+            'structureID': 1021121988766,
+            'structureShowInfoData': ['showinfo', 35832, 1021121988766]
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Citadel anchored in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by "C C P Alliance Holding"'
+        )
+
+    def test_citadel_attacked(self):
+        notification = {
+            'notification_type': 184,
+            'solarsystemID': self.hed_gp['id'],
+            'structureID': 1021121988766,
+            'structureShowInfoData': ['showinfo', 35832, 1021121988766],
+            'charID': self.ccp_falcon['id'],
+            'allianceName': self.ccp_alliance['name'],
+            'shieldPercentage': 5.459048365958682e-13,
+            'corpLinkData': ['showinfo', 2, self.ccp_corporation['id']],
+            'allianceID': self.ccp_alliance['id'],
+            'allianceLinkData': ['showinfo', 16159, self.ccp_alliance['id']],
+            'corpName': self.ccp_corporation['name'],
+            'hullPercentage': 99.79458190646601,
+            'armorPercentage': 0.0
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Citadel attacked (0.0% shield, 0.0% armor, 99.8% hull) in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
         )

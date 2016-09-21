@@ -34,6 +34,20 @@ class Slack:
             return self.entosis_enabled_structure(notification)
         if notification['notification_type'] is 149:
             return self.entosis_disabled_structure(notification)
+        if notification['notification_type'] is 160:
+            return self.sov_structure_reinforced(notification)
+        if notification['notification_type'] is 161:
+            return self.sov_structure_command_nodes_decloaked(notification)
+        if notification['notification_type'] is 162:
+            return self.sov_structure_destroyed(notification)
+        if notification['notification_type'] is 163:
+            return self.sov_structure_freeported(notification)
+        if notification['notification_type'] is 181:
+            return self.citadel_low_fuel(notification)
+        if notification['notification_type'] is 182:
+            return self.citadel_anchored(notification)
+        if notification['notification_type'] is 184:
+            return self.citadel_attacked(notification)
         else:
             return 'Unknown notification type for printing'
 
@@ -129,6 +143,62 @@ class Slack:
 
         return "Structure \"%s\" in %s has been disabled" % (structure, system)
 
+    # 160 - SOV structure reinforced
+    def sov_structure_reinforced(self, notification):
+        system = self.get_system(notification['solarSystemID'])
+        structure_type = self.get_campaign_event_type(notification['campaignEventType'])
+        timestamp = self.eve_timestamp_to_date(notification['decloakTime'])
+
+        return "SOV structure \"%s\" in %s has been reinforced, nodes will decloak \"%s\"" % (structure_type, system, timestamp)
+
+    # 161 - SOV structure command nodes decloaked
+    def sov_structure_command_nodes_decloaked(self, notification):
+        system = self.get_system(notification['solarSystemID'])
+        structure_type = self.get_campaign_event_type(notification['campaignEventType'])
+
+        return "Command nodes for \"%s\" SOV structure in %s have decloaked" % (structure_type, system)
+
+    # 162 - SOV Structure has been destroyed
+    def sov_structure_destroyed(self, notification):
+        system = self.get_system(notification['solarSystemID'])
+        structure_type = self.get_item(notification['structureTypeID'])
+
+        return "SOV structure \"%s\" in %s has been destroyed" % (structure_type, system)
+
+    # 163 - SOV Structure has been freeported
+    def sov_structure_freeported(self, notification):
+        system = self.get_system(notification['solarSystemID'])
+        structure_type = self.get_item(notification['structureTypeID'])
+        timestamp = self.eve_timestamp_to_date(notification['freeportexittime'])
+
+        return "SOV structure \"%s\" in %s has been freeported, exits freeport on \"%s\"" % (structure_type, system, timestamp)
+
+    # 181 - Citadel low fuel
+    def citadel_low_fuel(self, notification):
+        system = self.get_system(notification['solarsystemID'])
+
+        return "Citadel low fuel alert in %s" % (system)
+
+    # 182 - Citadel anchoring alert
+    def citadel_anchored(self, notification):
+        system = self.get_system(notification['solarsystemID'])
+        corp = notification['ownerCorpName']
+
+        return "Citadel anchored in %s by \"%s\"" % (system, corp)
+
+    # 184 - Citadel attacked
+    def citadel_attacked(self, notification):
+        system = self.get_system(notification['solarsystemID'])
+        attacker = self.get_character(notification['charID'])
+
+        return "Citadel attacked (%.1f%% shield, %.1f%% armor, %.1f%% hull) in %s by %s" % (
+            notification['shieldPercentage'],
+            notification['armorPercentage'],
+            notification['hullPercentage'],
+            system,
+            attacker)
+
+
     def get_corporation(self, corporation_id, alliance_id=None):
         name = self.eve.corporation_id_to_name(corporation_id)
         result = '<https://zkillboard.com/corporation/%d/|%s>' % (corporation_id, name)
@@ -163,6 +233,16 @@ class Slack:
             character['name'],
             self.get_corporation(character['corp']['id'], character['alliance']['id'])
         )
+
+    def get_campaign_event_type(self, event_type):
+        if event_type == 1:
+            return 'TCU'
+        elif event_type == 2:
+            return 'IHUB'
+        elif event_type == 3:
+            return 'Station'
+        else:
+            return 'Unknown structure type "%d"' % event_type
 
     def timestamp_to_date(self, timestamp):
         return datetime.datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
