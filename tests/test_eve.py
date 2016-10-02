@@ -151,14 +151,15 @@ class EveTest(TestCase):
 
     def test_get_character_by_id(self):
         response_mock = Mock()
-        response_mock.result = {
-            self.ccp_falcon['id']: self.ccp_falcon['name']
-        }
-        self.eve_api_mock.character_names_from_ids.return_value = response_mock
+        response_mock.result = self.ccp_falcon
+        self.eve_api_mock.affiliations_for_character.return_value = response_mock
+        character = self.eve.get_character_by_id(self.ccp_falcon['id'])
 
-        self.assertEqual(
-            self.eve.get_character_name_by_id(self.ccp_falcon['id']),
-            self.ccp_falcon['name']
-        )
-        self.eve_api_mock.character_names_from_ids.expect_called_once_with(
+        self.assertEqual(character['id'], self.ccp_falcon['id'])
+        self.assertEqual(character['name'], self.ccp_falcon['name'])
+        self.assertEqual(character['corp']['id'], self.ccp_falcon['corp']['id'])
+        self.assertEqual(character['corp']['name'], self.ccp_falcon['corp']['name'])
+        self.assertEqual(character['alliance']['id'], self.ccp_falcon['alliance']['id'])
+        self.assertEqual(character['alliance']['name'], self.ccp_falcon['alliance']['name'])
+        self.eve_api_mock.affiliations_for_character.expect_called_once_with(
             self.ccp_falcon['id'])

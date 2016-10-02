@@ -232,7 +232,7 @@ class Slack:
 
 
     def get_corporation(self, corporation_id, alliance_id=None):
-        name = self.eve.corporation_id_to_name(corporation_id)
+        name = self.eve.get_corporation_name_by_id(corporation_id)
         result = '<https://zkillboard.com/corporation/%d/|%s>' % (corporation_id, name)
 
         if alliance_id:
@@ -241,7 +241,7 @@ class Slack:
         return result
 
     def get_alliance(self, alliance_id):
-        name = self.eve.alliance_id_to_name(alliance_id)
+        name = self.eve.get_alliance_name_by_id(alliance_id)
         return '<https://zkillboard.com/alliance/%d/|%s>' % (alliance_id, name)
 
     def get_item(self, item_id):

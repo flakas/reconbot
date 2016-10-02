@@ -42,6 +42,5 @@ class Eve:
     def get_corporation_name_by_id(self, corporation_id):
         return self.eve_api.character_names_from_ids(corporation_id).result[corporation_id]
 
-    def get_character_name_by_id(self, character_id):
-        return self.eve_api.character_names_from_ids(character_id).result[character_id]
-
+    def get_character_by_id(self, character_id):
+        return self.eve_api.affiliations_for_character(character_id).result
