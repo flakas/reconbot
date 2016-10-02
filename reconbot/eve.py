@@ -1,6 +1,7 @@
 class Eve:
-    def __init__(self, db):
+    def __init__(self, db, eve_api):
         self.db = db
+        self.eve_api = eve_api
 
     def get_moon_by_id(self, moon_id):
         self.db.execute("SELECT * FROM mapDenormalize WHERE itemID=?", (moon_id,))
@@ -34,3 +35,13 @@ class Eve:
             'id': item['typeID'],
             'name': item['typeName'],
         }
+
+    def get_alliance_name_by_id(self, alliance_id):
+        return self.eve_api.character_names_from_ids(alliance_id).result[alliance_id]
+
+    def get_corporation_name_by_id(self, corporation_id):
+        return self.eve_api.character_names_from_ids(corporation_id).result[corporation_id]
+
+    def get_character_name_by_id(self, character_id):
+        return self.eve_api.character_names_from_ids(character_id).result[character_id]
+
