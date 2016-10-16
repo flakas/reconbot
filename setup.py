@@ -9,6 +9,10 @@ setup(
     description='Reconbot for Eve Online',
     packages=[
         'reconbot',
-        'reconbot.notifiers'
+        'reconbot.notifiers',
+        'reconbot.notificationprinters',
+        'reconbot.apiqueue',
+        'reconbot.eve',
+        'reconbot.tasks'
     ]
 )
