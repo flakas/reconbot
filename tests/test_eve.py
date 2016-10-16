@@ -1,3 +1,4 @@
+import datetime
 from unittest import TestCase
 from unittest.mock import Mock
 from reconbot.eve import Eve
@@ -6,7 +7,8 @@ class EveTest(TestCase):
     def setUp(self):
         self.db_mock = Mock()
         self.eve_api_mock = Mock()
-        self.eve = Eve(self.db_mock, self.eve_api_mock)
+        self.character_api_mock = Mock()
+        self.eve = Eve(self.db_mock, self.eve_api_mock, self.character_api_mock)
 
         self.ccp_alliance = {
             'id': 434243723,
@@ -163,3 +165,73 @@ class EveTest(TestCase):
         self.assertEqual(character['alliance']['name'], self.ccp_falcon['alliance']['name'])
         self.eve_api_mock.affiliations_for_character.expect_called_once_with(
             self.ccp_falcon['id'])
+
+    def test_is_recent_notification(self):
+        current_time = datetime.datetime.now().timestamp() - 1000
+
+        self.assertTrue(
+            self.eve.is_recent_notification(current_time, 3600))
+
+        self.assertFalse(
+            self.eve.is_recent_notification(current_time, 600))
+
+    def test_get_new_notifications(self):
+        current_time = datetime.datetime.now().timestamp()
+
+        notifications = {
+            1234567890: {
+                'notification_id': 1234567890,
+                'timestamp': current_time - 1000,
+                'type_id': '100'
+            },
+            1234567891: {
+                'notification_id': 1234567891,
+                'timestamp': current_time - 2000,
+                'type_id': '200'
+            }
+        };
+
+        new_notifications = self.eve.get_new_notifications(notifications)
+        self.assertEqual(len(new_notifications), 2)
+        self.assertEqual(new_notifications[1234567890]['type_id'], '100')
+        self.assertEqual(new_notifications[1234567891]['type_id'], '200')
+
+        new_notifications = self.eve.get_new_notifications(notifications, 1500)
+        self.assertEqual(len(new_notifications), 1)
+        self.assertEqual(new_notifications[1234567890]['type_id'], '100')
+
+    def test_get_notification_texts(self):
+        current_time = datetime.datetime.now().timestamp()
+        notifications = {
+            1234567890: {
+                'notification_id': 1234567890,
+                'timestamp': current_time - 1000,
+                'type_id': '100'
+            },
+            1234567891: {
+                'notification_id': 1234567891,
+                'timestamp': current_time - 2000,
+                'type_id': '200'
+            }
+        };
+
+        notification_texts_mock = Mock()
+        notification_texts_mock.result = {
+            1234567890: {
+                'structureTypeID': self.amarr_control_tower['id']
+            },
+            1234567891: {
+                'victimID': self.ccp_falcon['id']
+            }
+        }
+
+        self.character_api_mock.notification_texts.expect_called_once_with(notifications)
+        self.character_api_mock.notification_texts.return_value = notification_texts_mock
+
+        notification_texts = self.eve.get_notification_texts(notifications)
+
+        self.assertEqual(notification_texts[0]['notification_id'], 1234567891)
+        self.assertEqual(notification_texts[0]['victimID'], self.ccp_falcon['id'])
+
+        self.assertEqual(notification_texts[1]['notification_id'], 1234567890)
+        self.assertEqual(notification_texts[1]['structureTypeID'], self.amarr_control_tower['id'])

@@ -1,7 +1,10 @@
+import datetime
+
 class Eve:
-    def __init__(self, db, eve_api):
+    def __init__(self, db, eve_api, character_api=None):
         self.db = db
         self.eve_api = eve_api
+        self.character_api = character_api
 
     def get_moon_by_id(self, moon_id):
         self.db.execute("SELECT * FROM mapDenormalize WHERE itemID=?", (moon_id,))
@@ -44,3 +47,42 @@ class Eve:
 
     def get_character_by_id(self, character_id):
         return self.eve_api.affiliations_for_character(character_id).result
+
+    def get_notifications(self, max_age=None):
+        notifications = self.character_api.notifications().result
+        new_notifications = self.get_new_notifications(notifications, max_age)
+        return self.get_notification_texts(new_notifications)
+
+    def get_new_notifications(self, notifications, max_age=None):
+        return dict(filter(
+          lambda notification: self.is_recent_notification(notification[1]['timestamp'], max_age) is True,
+          notifications.items()))
+
+    def get_notification_texts(self, notifications):
+        notification_ids = notifications.keys()
+
+        if len(notification_ids) == 0:
+            return {}
+
+        notification_texts = self.character_api.notification_texts(notification_ids=notification_ids).result
+
+        for notification_id, notification in notifications.items():
+            if notification_id not in notification_texts:
+                continue
+            notification_texts[notification_id]['notification_timestamp'] = notification['timestamp']
+
+            if 'notification_type' not in notification_texts[notification_id]:
+                notification_texts[notification_id]['notification_type'] = notification['type_id']
+                notification_texts[notification_id]['notification_id'] = notification_id
+
+        return sorted(notification_texts.values(), key=lambda item: item['notification_timestamp'])
+
+    def is_recent_notification(self, timestamp, max_age=None):
+        if not max_age:
+            return True
+
+        now = datetime.datetime.utcnow()
+        event_time = datetime.datetime.utcfromtimestamp(timestamp)
+        difference = now - event_time
+        print(difference.total_seconds())
+        return difference.total_seconds() < max_age
