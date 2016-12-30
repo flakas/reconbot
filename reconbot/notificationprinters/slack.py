@@ -12,6 +12,8 @@ class Slack:
         return '[%s] %s' % (timestamp, text)
 
     def get_notification_text(self, notification):
+        if notification['notification_type'] is 27:
+            return self.corporation_war_declared(notification)
         if notification['notification_type'] is 41:
             return self.sov_claim_lost(notification)
         if notification['notification_type'] is 43:
@@ -56,6 +58,12 @@ class Slack:
             return self.citadel_out_of_fuel(notification)
         else:
             return 'Unknown notification type for printing'
+
+    def corporation_war_declared(self, notification):
+        against_corp = self.get_corporation(notification['againstID'])
+        declared_by_corp = self.get_corporation(notification['declaredByID'])
+
+        return 'War has been declared to %s by %s' % (against_corp, declared_by_corp)
 
     # 41
     def sov_claim_lost(self, notification):

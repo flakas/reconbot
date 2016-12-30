@@ -24,7 +24,7 @@ def notification_task(db, notification_options, api_queue, notifier):
         notifications = eve.get_notifications(max_age=MAX_NOTIFICATION_AGE_IN_SECONDS)
 
         if notification_options['whitelist']:
-            notifications = [notification['notification_type'] in notification_options['whitelist'] for notification in notifications]
+            notifications = [notification for notification in notifications if notification['notification_type'] in notification_options['whitelist']]
 
         printer = Slack(eve)
         messages = map(lambda text: printer.transform(text), notifications)

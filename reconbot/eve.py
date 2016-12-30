@@ -59,7 +59,7 @@ class Eve:
           notifications.items()))
 
     def get_notification_texts(self, notifications):
-        notification_ids = notifications.keys()
+        notification_ids = list(notifications.keys())
 
         if len(notification_ids) == 0:
             return {}

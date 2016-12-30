@@ -222,6 +222,19 @@ class SlackTest(TestCase):
             'SOV lost in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>)'
         )
 
+    def test_corporation_war_declared(self):
+        self.eve_mock.get_corporation_name_by_id.side_effect = lambda ID: self.game_masters_corporation['name'] if ID is self.game_masters_corporation['id'] else self.ccp_corporation['name']
+        notification = {
+            'notification_type': 27,
+            'againstID': self.ccp_corporation['id'],
+            'declaredByID': self.game_masters_corporation['id'],
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'War has been declared to <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> by <https://zkillboard.com/corporation/216121397/|Game Masters>'
+        )
+
     def test_sov_claim_acquired(self):
         notification = {
             'notification_type': 43,
