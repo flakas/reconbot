@@ -84,5 +84,4 @@ class Eve:
         now = datetime.datetime.utcnow()
         event_time = datetime.datetime.utcfromtimestamp(timestamp)
         difference = now - event_time
-        print(difference.total_seconds())
         return difference.total_seconds() < max_age
