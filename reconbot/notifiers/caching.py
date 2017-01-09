@@ -23,7 +23,5 @@ class CachingNotifier:
 
     def _cleanup(self):
         current_time = time.time()
-        for message, timeout in self.cache.items():
-            if timeout < current_time:
-                del self.cache[message]
 
+        self.cache = {message: timeout for message, timeout in self.cache.items() if timeout >= current_time}
