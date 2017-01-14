@@ -268,10 +268,15 @@ class Slack:
     def get_character(self, character_id):
         character = self.eve.get_character_by_id(character_id)
 
+        if 'alliance' in character:
+            alliance_id = character['alliance']['id']
+        else:
+            alliance_id = None
+
         return '<https://zkillboard.com/character/%d/|%s> (%s)' % (
             character['id'],
             character['name'],
-            self.get_corporation(character['corp']['id'], character['alliance']['id'])
+            self.get_corporation(character['corp']['id'], alliance_id)
         )
 
     def get_campaign_event_type(self, event_type):

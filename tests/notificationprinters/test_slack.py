@@ -34,6 +34,12 @@ class SlackTest(TestCase):
             'alliance': self.ccp_alliance
         }
 
+        self.ccp_someone = {
+            'id': 92532651,
+            'name': 'CCP Someone',
+            'corp': self.ccp_corporation
+        }
+
         self.hed_gp = {
             'id': 30001161,
             'name': 'HED-GP',
@@ -145,6 +151,13 @@ class SlackTest(TestCase):
         )
         self.eve_mock.get_alliance_name_by_id.assert_called_once_with(
             self.ccp_alliance['id']
+        )
+
+    def test_get_character_without_alliance(self):
+        self.eve_mock.get_character_by_id.return_value = self.ccp_someone
+        self.assertEqual(
+            self.printer.get_character(self.ccp_someone['id']),
+            '<https://zkillboard.com/character/92532651/|CCP Someone> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding>)'
         )
 
     def test_get_system(self):
