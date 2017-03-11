@@ -11,8 +11,5 @@ setup(
         'reconbot',
         'reconbot.notifiers',
         'reconbot.notificationprinters',
-        'reconbot.apiqueue',
-        'reconbot.eve',
-        'reconbot.tasks'
     ]
 )
