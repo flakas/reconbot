@@ -194,23 +194,27 @@ class Slack:
 
     # 181 - Citadel low fuel
     def citadel_low_fuel(self, notification):
+        citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
 
-        return "Citadel low fuel alert in %s" % (system)
+        return "Citadel (%s) low fuel alert in %s" % (citadel_type, system)
 
     # 182 - Citadel anchoring alert
     def citadel_anchored(self, notification):
+        citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
         corp = self.get_corporation(notification['ownerCorpLinkData'][-1])
 
-        return "Citadel anchored in %s by %s" % (system, corp)
+        return "Citadel (%s) anchored in %s by %s" % (citadel_type, system, corp)
 
     # 184 - Citadel attacked
     def citadel_attacked(self, notification):
+        citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
         attacker = self.get_character(notification['charID'])
 
-        return "Citadel attacked (%.1f%% shield, %.1f%% armor, %.1f%% hull) in %s by %s" % (
+        return "Citadel (%s) attacked (%.1f%% shield, %.1f%% armor, %.1f%% hull) in %s by %s" % (
+            citadel_type,
             notification['shieldPercentage'],
             notification['armorPercentage'],
             notification['hullPercentage'],
@@ -219,25 +223,29 @@ class Slack:
 
     # 185 - Citadel onlined
     def citadel_onlined(self, notification):
+        citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
 
-        return "Citadel onlined in %s" % (system)
+        return "Citadel (%s) onlined in %s" % (citadel_type, system)
 
     # 188 - Citadel destroyed
     def citadel_destroyed(self, notification):
+        citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
         corp = self.get_corporation(notification['ownerCorpLinkData'][-1])
 
-        return "Citadel destroyed in %s owned by %s" % (system, corp)
+        return "Citadel (%s) destroyed in %s owned by %s" % (citadel_type, system, corp)
 
     # 198 - Citadel ran out of fuel
     def citadel_out_of_fuel(self, notification):
         system = self.get_system(notification['solarsystemID'])
+        citadel_type = self.get_item(notification['structureShowInfoData'][1])
         services = map(lambda ID: self.get_item(ID), notification['listOfServiceModuleIDs'])
 
-        return "Citadel ran out of fuel in %s with services \"%s\"" % (system, ', '.join(services))
-
-
+        return "Citadel (%s) ran out of fuel in %s with services \"%s\"" % (
+            citadel_type,
+            system,
+            ', '.join(services))
 
     def get_corporation(self, corporation_id, alliance_id=None):
         name = self.eve.get_corporation_name_by_id(corporation_id)

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import Mock
+from unittest.mock import Mock, call
 
 from reconbot.notificationprinters.slack import Slack
 
@@ -450,6 +450,7 @@ class SlackTest(TestCase):
         )
 
     def test_citadel_low_fuel(self):
+        self.eve_mock.get_item_by_id.return_value = self.astrahus
         notification = {
             'notification_type': 181,
             'solarsystemID': self.hed_gp['id'],
@@ -460,10 +461,11 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel low fuel alert in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
+            'Citadel (Astrahus) low fuel alert in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
         )
 
     def test_citadel_anchored(self):
+        self.eve_mock.get_item_by_id.return_value = self.astrahus
         notification = {
             'notification_type': 182,
             'solarsystemID': self.hed_gp['id'],
@@ -477,10 +479,11 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel anchored in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding>'
+            'Citadel (Astrahus) anchored in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding>'
         )
 
     def test_citadel_attacked(self):
+        self.eve_mock.get_item_by_id.return_value = self.astrahus
         notification = {
             'notification_type': 184,
             'solarsystemID': self.hed_gp['id'],
@@ -499,10 +502,11 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel attacked (0.0% shield, 0.0% armor, 99.8% hull) in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
+            'Citadel (Astrahus) attacked (0.0% shield, 0.0% armor, 99.8% hull) in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
         )
 
     def test_citadel_onlined(self):
+        self.eve_mock.get_item_by_id.return_value = self.astrahus
         notification = {
             'notification_type': 185,
             'solarsystemID': self.hed_gp['id'],
@@ -512,10 +516,11 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel onlined in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
+            'Citadel (Astrahus) onlined in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
         )
 
     def test_citadel_destroyed(self):
+        self.eve_mock.get_item_by_id.return_value = self.astrahus
         notification = {
             'notification_type': 188,
             'solarsystemID': self.hed_gp['id'],
@@ -527,11 +532,11 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel destroyed in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> owned by <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding>'
+            'Citadel (Astrahus) destroyed in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> owned by <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding>'
         )
 
     def test_citadel_out_of_fuel(self):
-        self.eve_mock.get_item_by_id.return_value = self.standup_cloning_center
+        self.eve_mock.get_item_by_id.side_effect = lambda ID: self.astrahus if ID is self.astrahus['id'] else self.standup_cloning_center
         notification = {
             'notification_type': 198,
             'listOfServiceModuleIDs': [self.standup_cloning_center['id']],
@@ -542,8 +547,7 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel ran out of fuel in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> with services "Standup Cloning Center I"'
+            'Citadel (Astrahus) ran out of fuel in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> with services "Standup Cloning Center I"'
         )
-        self.eve_mock.get_item_by_id.assert_called_once_with(
-            self.standup_cloning_center['id']
-        )
+        self.eve_mock.get_item_by_id.assert_any_call(self.astrahus['id'])
+        self.eve_mock.get_item_by_id.assert_any_call(self.standup_cloning_center['id'])
