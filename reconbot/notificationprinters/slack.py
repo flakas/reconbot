@@ -196,25 +196,36 @@ class Slack:
     def citadel_low_fuel(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
+        citadel_name = self.get_structure_name_by_id(notification['structureID'])
 
-        return "Citadel (%s) low fuel alert in %s" % (citadel_type, system)
+        return "Citadel (%s, \"%s\") low fuel alert in %s" % (
+            citadel_type,
+            citadel_name,
+            system)
 
     # 182 - Citadel anchoring alert
     def citadel_anchored(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
         corp = self.get_corporation(notification['ownerCorpLinkData'][-1])
+        citadel_name = self.get_structure_name_by_id(notification['structureID'])
 
-        return "Citadel (%s) anchored in %s by %s" % (citadel_type, system, corp)
+        return "Citadel (%s, \"%s\") anchored in %s by %s" % (
+            citadel_type,
+            citadel_name,
+            system,
+            corp)
 
     # 184 - Citadel attacked
     def citadel_attacked(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
         attacker = self.get_character(notification['charID'])
+        citadel_name = self.get_structure_name_by_id(notification['structureID'])
 
-        return "Citadel (%s) attacked (%.1f%% shield, %.1f%% armor, %.1f%% hull) in %s by %s" % (
+        return "Citadel (%s, \"%s\") attacked (%.1f%% shield, %.1f%% armor, %.1f%% hull) in %s by %s" % (
             citadel_type,
+            citadel_name,
             notification['shieldPercentage'],
             notification['armorPercentage'],
             notification['hullPercentage'],
@@ -225,25 +236,36 @@ class Slack:
     def citadel_onlined(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
+        citadel_name = self.get_structure_name_by_id(notification['structureID'])
 
-        return "Citadel (%s) onlined in %s" % (citadel_type, system)
+        return "Citadel (%s, \"%s\") onlined in %s" % (
+            citadel_type,
+            citadel_name,
+            system)
 
     # 188 - Citadel destroyed
     def citadel_destroyed(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
         corp = self.get_corporation(notification['ownerCorpLinkData'][-1])
+        citadel_name = self.get_structure_name_by_id(notification['structureID'])
 
-        return "Citadel (%s) destroyed in %s owned by %s" % (citadel_type, system, corp)
+        return "Citadel (%s, \"%s\") destroyed in %s owned by %s" % (
+            citadel_type,
+            citadel_name,
+            system,
+            corp)
 
     # 198 - Citadel ran out of fuel
     def citadel_out_of_fuel(self, notification):
         system = self.get_system(notification['solarsystemID'])
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         services = map(lambda ID: self.get_item(ID), notification['listOfServiceModuleIDs'])
+        citadel_name = self.get_structure_name_by_id(notification['structureID'])
 
-        return "Citadel (%s) ran out of fuel in %s with services \"%s\"" % (
+        return "Citadel (%s, \"%s\") ran out of fuel in %s with services \"%s\"" % (
             citadel_type,
+            citadel_name,
             system,
             ', '.join(services))
 
@@ -296,6 +318,13 @@ class Slack:
             return 'Station'
         else:
             return 'Unknown structure type "%d"' % event_type
+
+    def get_structure_name_by_id(self, structure_id):
+        structure = self.eve.get_structure_by_id(structure_id)
+        if 'name' in structure:
+            return structure['name']
+        else:
+            return "Unknown name"
 
     def timestamp_to_date(self, timestamp):
         return datetime.datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')

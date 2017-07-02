@@ -1,4 +1,5 @@
 import datetime
+import requests
 
 class Eve:
     def __init__(self, db, eve_api, character_api=None):
@@ -85,3 +86,17 @@ class Eve:
         event_time = datetime.datetime.utcfromtimestamp(timestamp)
         difference = now - event_time
         return difference.total_seconds() < max_age
+
+    def get_structure_by_id(self, structure_id):
+        structure_id = str(structure_id)
+        try:
+            r = requests.get('https://stop.hammerti.me.uk/api/citadel/%s' % structure_id)
+            json = r.json()
+            return json
+            if not isinstance(json, dict):
+                return {}
+            if structure_id not in json:
+                return {}
+            return json[structure_id]
+        except Exception as ex:
+            return {}

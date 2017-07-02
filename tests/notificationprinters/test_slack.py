@@ -93,6 +93,26 @@ class SlackTest(TestCase):
             'name': 'Standup Cloning Center I'
         }
 
+        self.ichooseyou_hub_fortizar = {
+            'structure_id': 1023164547009,
+            'structure': {
+                "typeId": 35833,
+                "regionId": 10000002,
+                "typeName": "Fortizar",
+                "lastSeen": "2017-07-02T11:37:44.359Z",
+                "firstSeen": "2017-01-13T18:07:24Z",
+                "regionName": "The Forge",
+                "name": "Perimeter - IChooseYou Trade Hub",
+                "systemId": 30000144,
+                "location": {
+                    "y": 44793533020.0,
+                    "x": 660596273924.0,
+                    "z": 2112970671473.0},
+                "systemName": "Perimeter",
+                "public": True
+            }
+        }
+
         self.eve_mock.get_alliance_name_by_id.return_value = self.ccp_alliance['name']
         self.eve_mock.get_corporation_name_by_id.return_value = self.ccp_corporation['name']
         self.eve_mock.get_character_by_id.return_value = self.ccp_falcon
@@ -100,6 +120,7 @@ class SlackTest(TestCase):
         self.eve_mock.get_planet_by_id.return_value = self.hed_gp_planet
         self.eve_mock.get_moon_by_id.return_value = self.hed_gp_moon
         self.eve_mock.get_item_by_id.return_value = self.amarr_control_tower
+        self.eve_mock.get_structure_by_id.return_value = self.ichooseyou_hub_fortizar['structure']
 
     def test_get_alliance(self):
         self.assertEqual(
@@ -209,6 +230,12 @@ class SlackTest(TestCase):
         self.assertEqual(
             self.printer.get_campaign_event_type(9999),
             'Unknown structure type "9999"'
+        )
+
+    def test_get_structure_name_by_id(self):
+        self.assertEqual(
+            self.printer.get_structure_name_by_id(self.ichooseyou_hub_fortizar['structure_id']),
+            self.ichooseyou_hub_fortizar['structure']['name']
         )
 
     def test_transforms_unknown_notification_type(self):
@@ -461,7 +488,7 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel (Astrahus) low fuel alert in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
+            'Citadel (Astrahus, "Perimeter - IChooseYou Trade Hub") low fuel alert in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
         )
 
     def test_citadel_anchored(self):
@@ -479,7 +506,7 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel (Astrahus) anchored in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding>'
+            'Citadel (Astrahus, "Perimeter - IChooseYou Trade Hub") anchored in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding>'
         )
 
     def test_citadel_attacked(self):
@@ -502,7 +529,7 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel (Astrahus) attacked (0.0% shield, 0.0% armor, 99.8% hull) in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
+            'Citadel (Astrahus, "Perimeter - IChooseYou Trade Hub") attacked (0.0% shield, 0.0% armor, 99.8% hull) in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
         )
 
     def test_citadel_onlined(self):
@@ -516,7 +543,7 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel (Astrahus) onlined in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
+            'Citadel (Astrahus, "Perimeter - IChooseYou Trade Hub") onlined in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
         )
 
     def test_citadel_destroyed(self):
@@ -532,7 +559,7 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel (Astrahus) destroyed in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> owned by <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding>'
+            'Citadel (Astrahus, "Perimeter - IChooseYou Trade Hub") destroyed in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> owned by <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding>'
         )
 
     def test_citadel_out_of_fuel(self):
@@ -547,7 +574,7 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            'Citadel (Astrahus) ran out of fuel in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> with services "Standup Cloning Center I"'
+            'Citadel (Astrahus, "Perimeter - IChooseYou Trade Hub") ran out of fuel in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> with services "Standup Cloning Center I"'
         )
         self.eve_mock.get_item_by_id.assert_any_call(self.astrahus['id'])
         self.eve_mock.get_item_by_id.assert_any_call(self.standup_cloning_center['id'])
