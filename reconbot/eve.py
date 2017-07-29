@@ -1,5 +1,10 @@
 import datetime
 import requests
+import evelink.api
+import yaml
+
+# Use Yaml parser for EVE response structures
+evelink.api.parse_keyval_data = lambda data_string: yaml.load(data_string)
 
 class Eve:
     def __init__(self, db, eve_api, character_api=None):
