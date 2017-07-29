@@ -97,7 +97,6 @@ class Eve:
         try:
             r = requests.get('https://stop.hammerti.me.uk/api/citadel/%s' % structure_id)
             json = r.json()
-            return json
             if not isinstance(json, dict):
                 return {}
             if structure_id not in json:
