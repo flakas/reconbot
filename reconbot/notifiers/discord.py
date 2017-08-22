@@ -15,7 +15,6 @@ class DiscordNotifier:
 
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._send_message(channel_id, text))
-        loop.close()
 
     async def _send_message(self, channel_id, message):
         await self.client.login(self.token)
