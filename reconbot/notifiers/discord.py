@@ -5,7 +5,6 @@ class DiscordNotifier:
     def __init__(self, token, channel_id):
         self.token = token
         self.channel_id = channel_id
-        self.client = discord.Client()
 
     def notify(self, text, options={}):
         if 'channel' in options:
@@ -13,8 +12,10 @@ class DiscordNotifier:
         else:
             channel_id = self.channel_id
 
+        self.client = discord.Client()
         loop = asyncio.get_event_loop()
         loop.run_until_complete(self._send_message(channel_id, text))
+        self.client = None
 
     async def _send_message(self, channel_id, message):
         await self.client.login(self.token)
