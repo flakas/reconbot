@@ -54,6 +54,8 @@ class Printer(object):
             return self.citadel_attacked(notification)
         if notification['notification_type'] is 185:
             return self.citadel_onlined(notification)
+        if notification['notification_type'] is 186:
+            return self.citadel_reinforced(notification)
         if notification['notification_type'] is 188:
             return self.citadel_destroyed(notification)
         if notification['notification_type'] is 198:
