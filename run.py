@@ -50,6 +50,7 @@ def notifications_job():
         db,
         eve_apis['example-group']['notifications'],
         api_queue,
+        'slack',
         CachingNotifier(
             SplitterNotifier([
                 SlackNotifier(

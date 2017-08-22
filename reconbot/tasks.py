@@ -6,8 +6,9 @@ import evelink.eve
 
 from reconbot.eve import Eve
 from reconbot.notificationprinters.slack import Slack
+from reconbot.notificationprinters.slack import Discord
 
-def notification_task(db, notification_options, api_queue, notifier):
+def notification_task(db, notification_options, api_queue, printer, notifier):
     MAX_NOTIFICATION_AGE_IN_SECONDS = 3600
 
     try:
@@ -26,7 +27,11 @@ def notification_task(db, notification_options, api_queue, notifier):
         if notification_options['whitelist']:
             notifications = [notification for notification in notifications if notification['notification_type'] in notification_options['whitelist']]
 
-        printer = Slack(eve)
+        if printer === 'discord':
+            printer = Discord(eve)
+        else:
+            printer = Slack(eve)
+
         messages = map(lambda text: printer.transform(text), notifications)
 
         for message in messages:
