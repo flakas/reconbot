@@ -2,7 +2,7 @@ Reconbot for Eve Online [![CircleCI](https://circleci.com/gh/flakas/reconbot.svg
 =======================
 
 Reconbot is a notification bot for Eve Online.
-It fetches character notifications from the EVE API, filters irrelevant ones out and sends relevant ones to set Slack channels.
+It fetches character notifications from the EVE API, filters irrelevant ones out and sends relevant ones to set Slack or Discord channels.
 Notifications like SOV changes, SOV/POS/POCO/Citadel attacks.
 
 # Setup
