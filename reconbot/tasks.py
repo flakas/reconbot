@@ -27,7 +27,7 @@ def notification_task(db, notification_options, api_queue, printer, notifier):
         if notification_options['whitelist']:
             notifications = [notification for notification in notifications if notification['notification_type'] in notification_options['whitelist']]
 
-        if printer === 'discord':
+        if printer == 'discord':
             printer = Discord(eve)
         else:
             printer = Slack(eve)
