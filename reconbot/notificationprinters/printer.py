@@ -252,7 +252,7 @@ class Printer(object):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
         citadel_name = self.get_structure_name_by_id(notification['structureID'])
-        timestamp = self.eve_duration_to_date(notification['timeLeft'])
+        timestamp = self.eve_duration_to_date(notification['notification_timestamp'], notification['timeLeft'])
 
         return "Citadel (%s, \"%s\") reinforced in %s (comes out of reinforce on \"%s\")" % (
             citadel_type,
@@ -340,12 +340,12 @@ class Printer(object):
         seconds = microseconds/10000000 - 11644473600
         return datetime.datetime.utcfromtimestamp(seconds).strftime('%Y-%m-%d %H:%M:%S')
 
-    def eve_duration_to_date(self, microseconds):
+    def eve_duration_to_date(self, timestamp, microseconds):
         """
         Convert microsoft epoch to unix epoch
         Based on: http://www.wiki.eve-id.net/APIv2_Char_NotificationTexts_XML
         """
 
         seconds = microseconds/10000000
-        timedelta = datetime.datetime.utcnow() + datetime.timedelta(seconds=seconds)
+        timedelta = datetime.datetime.utcfromtimestamp(timestamp) + datetime.timedelta(seconds=seconds)
         return timedelta.strftime('%Y-%m-%d %H:%M:%S')
