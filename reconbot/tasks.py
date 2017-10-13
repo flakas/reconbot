@@ -1,4 +1,4 @@
-import sys, traceback
+import sys, traceback, datetime
 
 import evelink.api
 import evelink.char
@@ -38,8 +38,37 @@ def notification_task(db, notification_options, api_queue, printer, notifier):
             notifier.notify(message)
 
     except Exception as e:
-        print('Exception in notification task')
-        print('-' * 60)
-        traceback.print_exc(file=sys.stdout)
-        print(e)
-        print('-' * 60)
+        notify_exception("notification_task", e)
+
+def esi_notification_task(notification_options, api_queue, printer, notifier):
+    MAX_NOTIFICATION_AGE_IN_SECONDS = 3600
+
+    try:
+        sso = api_queue.get()
+
+        esi = ESI(sso)
+
+        notifications = esi.get_new_notifications(max_age=MAX_NOTIFICATION_AGE_IN_SECONDS)
+
+        if notification_options['whitelist']:
+            notifications = [notification for notification in notifications if notification['type'] in notification_options['whitelist']]
+
+        if printer == 'discord':
+            printer = Discord(eve)
+        else:
+            printer = Slack(eve)
+
+        messages = map(lambda text: printer.transform(text), notifications)
+
+        for message in messages:
+            notifier.notify(message)
+
+    except Exception as e:
+        notify_exception("esi_notification_task", e)
+
+def notify_exception(location, exception):
+    print('[%s] Exception in %s' % (datetime.datetime.now(), location))
+    print('-' * 60)
+    traceback.print_exc(file=sys.stdout)
+    print(exception)
+    print('-' * 60)
