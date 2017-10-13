@@ -30,7 +30,8 @@ class Printer(object):
             'StructureAnchoring': self.citadel_anchored,
             'StructureUnanchoring': self.citadel_unanchored,
             'StructureServicesOffline': self.citadel_out_of_fuel,
-            'StructureLostShields': self.citadel_reinforced,
+            'StructureLostShields': self.citadel_lost_shields,
+            'StructureLostShields': self.citadel_lost_armor,
             'TowerAlertMsg': self.pos_attack,
             'StationServiceEnabled': self.entosis_enabled_structure,
             'StationServiceDisabled': self.entosis_disabled_structure,
@@ -256,13 +257,25 @@ class Printer(object):
             system)
 
     # 186 - Citadel reinforced
-    def citadel_reinforced(self, notification):
+    def citadel_lost_shields(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
         citadel_name = self.get_structure_name(notification['structureID'])
         timestamp = self.eve_duration_to_date(notification['timeLeft'])
 
-        return "Citadel (%s, \"%s\") reinforced in %s (comes out of reinforce on \"%s\")" % (
+        return "Citadel (%s, \"%s\") lost shields in %s (comes out of reinforce on \"%s\")" % (
+            citadel_type,
+            citadel_name,
+            system,
+            timestamp)
+
+    def citadel_lost_armor(self, notification):
+        citadel_type = self.get_item(notification['structureShowInfoData'][1])
+        system = self.get_system(notification['solarsystemID'])
+        citadel_name = self.get_structure_name(notification['structureID'])
+        timestamp = self.eve_duration_to_date(notification['timeLeft'])
+
+        return "Citadel (%s, \"%s\") lost armor in %s (comes out of reinforce on \"%s\")" % (
             citadel_type,
             citadel_name,
             system,
