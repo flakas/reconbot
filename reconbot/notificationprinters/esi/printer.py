@@ -16,6 +16,7 @@ class Printer(object):
 
     def get_notification_text(self, notification):
         text = yaml.load(notification['text'])
+        text['notification_timestamp'] = notification['timestamp']
 
         types = {
             'AllWarDeclaredMsg': self.corporation_war_declared,
@@ -28,10 +29,10 @@ class Printer(object):
             'StructureOnline': self.citadel_onlined,
             'StructureFuelAlert': self.citadel_low_fuel,
             'StructureAnchoring': self.citadel_anchored,
-            'StructureUnanchoring': self.citadel_unanchored,
+            'StructureUnanchoring': self.citadel_unanchoring,
             'StructureServicesOffline': self.citadel_out_of_fuel,
             'StructureLostShields': self.citadel_lost_shields,
-            'StructureLostShields': self.citadel_lost_armor,
+            'StructureLostArmor': self.citadel_lost_armor,
             'TowerAlertMsg': self.pos_attack,
             'StationServiceEnabled': self.entosis_enabled_structure,
             'StationServiceDisabled': self.entosis_disabled_structure,
@@ -216,13 +217,13 @@ class Printer(object):
             system,
             corp)
 
-    def citadel_unanchored(self, notification):
+    def citadel_unanchoring(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
         corp = self.get_corporation(notification['ownerCorpLinkData'][-1])
         citadel_name = self.get_structure_name(notification['structureID'])
 
-        return "Citadel (%s, \"%s\") unanchored in %s by %s" % (
+        return "Citadel (%s, \"%s\") unanchoring in %s by %s" % (
             citadel_type,
             citadel_name,
             system,
@@ -261,7 +262,7 @@ class Printer(object):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
         citadel_name = self.get_structure_name(notification['structureID'])
-        timestamp = self.eve_duration_to_date(notification['timeLeft'])
+        timestamp = self.eve_duration_to_date(notification['notification_timestamp'], notification['timeLeft'])
 
         return "Citadel (%s, \"%s\") lost shields in %s (comes out of reinforce on \"%s\")" % (
             citadel_type,
@@ -273,7 +274,7 @@ class Printer(object):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
         citadel_name = self.get_structure_name(notification['structureID'])
-        timestamp = self.eve_duration_to_date(notification['timeLeft'])
+        timestamp = self.eve_duration_to_date(notification['notification_timestamp'], notification['timeLeft'])
 
         return "Citadel (%s, \"%s\") lost armor in %s (comes out of reinforce on \"%s\")" % (
             citadel_type,
@@ -390,13 +391,13 @@ class Printer(object):
         seconds = microseconds/10000000 - 11644473600
         return datetime.datetime.utcfromtimestamp(seconds).strftime('%Y-%m-%d %H:%M:%S')
 
-    def eve_duration_to_date(self, microseconds):
+    def eve_duration_to_date(self, timestamp, microseconds):
         """
         Convert microsoft epoch to unix epoch
         Based on: http://www.wiki.eve-id.net/APIv2_Char_NotificationTexts_XML
         """
 
         seconds = microseconds/10000000
-        timedelta = datetime.datetime.utcnow() + datetime.timedelta(seconds=seconds)
+        timedelta = datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ") + datetime.timedelta(seconds=seconds)
         return timedelta.strftime('%Y-%m-%d %H:%M:%S')
 

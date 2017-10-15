@@ -2,6 +2,7 @@ import requests
 import base64
 import functools
 import datetime
+import time
 
 class ESI:
     def __init__(self, sso):
@@ -74,16 +75,24 @@ class ESI:
         )
 
     def esi_get(self, endpoint, query={}):
+        max_attempts = 3
+        failed_request_delay = 10
+
         query['token'] = self.sso.get_access_token()
         query['datasource'] = 'tranquility'
 
         url = '%s%s' % (self.esi_server, endpoint)
 
-        r = requests.get(url, params=query)
+        for attempt in range(1, max_attempts + 1):
+            r = requests.get(url, params=query)
 
-        if r.status_code == 200:
-            response = r.json()
-            return response
-        else:
-            print(r.headers)
-            r.raise_for_status()
+            if r.status_code == 200:
+                response = r.json()
+                return response
+            elif r.status_code >= 500 and r.status_code < 600 and attempt < max_attempts:
+                print('Delaying as server recovery attempt')
+                time.sleep(failed_request_delay)
+                continue
+            else:
+                print(r.headers)
+                r.raise_for_status()

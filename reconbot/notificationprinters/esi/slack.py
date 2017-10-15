@@ -1,4 +1,5 @@
 import abc
+import requests
 from reconbot.notificationprinters.esi.printer import Printer
 
 class Slack(Printer):
@@ -21,7 +22,15 @@ class Slack(Printer):
         return '<http://evemaps.dotlan.net/system/%s|%s>' % (system['name'], system['name'])
 
     def get_character(self, character_id):
-        character = self.eve.get_character(character_id)
+        try:
+            character = self.eve.get_character(character_id)
+        except requests.HTTPError as ex:
+            # Patch for character being unresolvable and ESI throwing internal errors
+            # Temporarily stub character to not break our behavior.
+            if ex.response.status_code == 500:
+                character = { 'name': 'Unknown character', 'corporation_id': 98356193 }
+            else:
+                raise
 
         return '<https://zkillboard.com/character/%d/|%s> (%s)' % (
             character_id,
