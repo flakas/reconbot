@@ -8,6 +8,7 @@ from reconbot.eve import Eve
 from reconbot.notificationprinters.slack import Slack
 from reconbot.notificationprinters.discord import Discord
 from reconbot.notificationprinters.esi.slack import Slack as ESISlack
+from reconbot.notificationprinters.esi.discord import Discord as ESIDiscord
 
 def notification_task(db, notification_options, api_queue, printer, notifier):
     MAX_NOTIFICATION_AGE_IN_SECONDS = 3600
@@ -55,7 +56,7 @@ def esi_notification_task(notification_options, api_queue, printer, notifier):
             notifications = [notification for notification in notifications if notification['type'] in notification_options['whitelist']]
 
         if printer == 'discord':
-            # printer = ESIDiscord(esi)
+            printer = ESIDiscord(esi)
         else:
             printer = ESISlack(esi)
 
