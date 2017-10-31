@@ -20,6 +20,9 @@ class Printer(object):
 
         types = {
             'AllWarDeclaredMsg': self.corporation_war_declared,
+            'DeclareWar': self.declare_war,
+            'AllWarInvalidatedMsg': self.corporation_war_invalidated,
+            'AllyJoinedWarAggressorMsg': self.aggressor_ally_joined_war,
             'CorpWarDeclaredMsg': self.corporation_war_declared,
             'EntosisCaptureStarted': self.entosis_capture_started,
             'SovCommandNodeEventStarted': self.sov_structure_command_nodes_decloaked,
@@ -35,6 +38,7 @@ class Printer(object):
             'StructureLostShields': self.citadel_lost_shields,
             'StructureLostArmor': self.citadel_lost_armor,
             'TowerAlertMsg': self.pos_attack,
+            'TowerResourceAlertMsg': self.pos_fuel_alert,
             'StationServiceEnabled': self.entosis_enabled_structure,
             'StationServiceDisabled': self.entosis_disabled_structure,
             'OrbitalReinforced': self.customs_office_reinforced,
@@ -46,7 +50,19 @@ class Printer(object):
             'SovAllClaimLostMsg': self.sov_claim_lost,
             'SovStructureSelfDestructRequested': self.sov_structure_started_self_destructing,
             'SovStructureSelfDestructFinished': self.sov_structure_self_destructed,
-            'StationConquerMsg': self.station_conquered
+            'StationConquerMsg': self.station_conquered,
+            'notificationTypeMoonminingExtractionStarted': self.moon_extraction_started,
+            'CorpAllBillMsg': self.corporation_bill,
+            'BillPaidCorpAllMsg': self.corporation_bill_paid,
+            'CharAppAcceptMsg': self.character_application_accepted,
+            'CorpAppNewMsg': self.new_character_application_to_corp,
+            'CharAppWithdrawMsg': self.character_application_withdrawn,
+            'CharLeftCorpMsg': self.character_left_corporation,
+            'CorpNewCEOMsg': self.new_corporation_ceo,
+            'CorpVoteMsg': self.corporation_vote_initiated,
+            'CorpVoteCEORevokedMsg': self.corporation_vote_for_ceo_revoked,
+            'CorpTaxChangeMsg': self.corporation_tax_changed,
+            'CorpDividendMsg': self.corporation_dividend_paid_out
         }
 
         if notification['type'] in types:
@@ -65,6 +81,46 @@ class Printer(object):
             declared_by_corp = self.get_alliance(notification['declaredByID'])
 
         return 'War has been declared to %s by %s' % (against_corp, declared_by_corp)
+
+    def declare_war(self, notification):
+        character = self.get_character(notification['charID'])
+        try:
+            defender = self.get_corporation(notification['defenderID'])
+        except:
+            defender = self.get_alliance(notification['defenderID'])
+        try:
+            entity = self.get_corporation(notification['entityID'])
+        except:
+            entity = self.get_alliance(notification['entityID'])
+
+        return '%s from %s has declared war to %s' % (character, entity, defender)
+
+
+    def corporation_war_invalidated(self, notification):
+        try:
+            against_corp = self.get_corporation(notification['againstID'])
+        except:
+            against_corp = self.get_alliance(notification['againstID'])
+        try:
+            declared_by_corp = self.get_corporation(notification['declaredByID'])
+        except:
+            declared_by_corp = self.get_alliance(notification['declaredByID'])
+
+        return 'War has been invalidated to %s by %s' % (against_corp, declared_by_corp)
+
+    def aggressor_ally_joined_war(self, notification):
+        try:
+            defender = self.get_corporation(notification['defenderID'])
+        except:
+            defender = self.get_alliance(notification['defenderID'])
+        try:
+            ally = self.get_corporation(notification['allyID'])
+        except:
+            ally = self.get_alliance(notification['allyID'])
+
+        timestamp = self.eve_timestamp_to_date(notification['startTime'])
+
+        return 'Ally %s joined the war to help %s starting %s' % (ally, defender, timestamp)
 
     # 41
     def sov_claim_lost(self, notification):
@@ -100,6 +156,17 @@ class Printer(object):
             notification['armorValue']*100,
             notification['hullValue']*100,
             attacker
+        )
+
+    def pos_fuel_alert(self, notification):
+        moon = self.eve.get_moon(notification['moonID'])
+        item_type = self.get_item(notification['typeID'])
+        wants = map(lambda w: '%s: %d' % (self.get_item(w['typeID']), w['quantity']), notification['wants'])
+
+        return "%s POS \"%s\" is low on fuel: %s" % (
+            moon['name'],
+            item_type,
+            ', '.join(wants)
         )
 
     # 79
@@ -195,7 +262,6 @@ class Printer(object):
 
     # 181 - Citadel low fuel
     def citadel_low_fuel(self, notification):
-        print(notification)
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
         citadel_name = self.get_structure_name(notification['structureID'])
@@ -337,6 +403,92 @@ class Printer(object):
 
         return 'Self-destruction of "%s" SOV structure in %s has been requested by %s. Structure will self-destruct on "%s"' % (item, system, character, end_time)
 
+    def moon_extraction_started(self, notification):
+        started_by = self.get_character(notification['startedBy'])
+        system = self.get_system(notification['solarSystemID'])
+        moon = self.eve.get_moon(notification['moonID'])
+        ready_time = self.eve_timestamp_to_date(notification['readyTime'])
+        auto_destruct_time = self.eve_timestamp_to_date(notification['autoTime'])
+
+        return 'Moon extraction started by %s in %s (%s) and will be ready on %s (or will self-destruct on %s)' % (started_by, system, moon['name'], ready_time, auto_destruct_time)
+
+    def corporation_bill(self, notification):
+        try:
+            debtor = self.get_corporation(notification['debtorID'])
+        except:
+            debtor = self.get_alliance(notification['debtorID'])
+        try:
+            creditor = self.get_corporation(notification['creditorID'])
+        except:
+            creditor = self.get_alliance(notification['creditorID'])
+        current_timestamp = self.eve_timestamp_to_date(notification['currentDate'])
+        due_timestamp = self.eve_timestamp_to_date(notification['dueDate'])
+
+        return 'Corporation bill issued to %s by %s for the amount of %.2f ISK at %s. Bill is due %s' % (
+            debtor,
+            creditor,
+            notification['amount'],
+            current_timestamp,
+            due_timestamp
+        )
+
+    def corporation_bill_paid(self, notification):
+        due_timestamp = self.eve_timestamp_to_date(notification['dueDate'])
+
+        return 'Corporation bill for %.2f ISK was paid. Bill was due %s' % (
+            notification['amount'],
+            due_timestamp
+        )
+
+    def new_character_application_to_corp(self, notification):
+        character = self.get_character(notification['charID'])
+        corporation = self.get_corporation(notification['corpID'])
+
+        return "Character %s has applied to corporation %s. Application text:\n\n%s" % (character, corporation, notification['applicationText'])
+
+    def character_application_withdrawn(self, notification):
+        character = self.get_character(notification['charID'])
+        corporation = self.get_corporation(notification['corpID'])
+
+        return 'Character %s application to corporation %s has been withdrawn' % (character, corporation)
+
+    def character_application_accepted(self, notification):
+        character = self.get_character(notification['charID'])
+        corporation = self.get_corporation(notification['corpID'])
+
+        return 'Character %s accepted to corporation %s' % (character, corporation)
+
+    def character_left_corporation(self, notification):
+        character = self.get_character(notification['charID'])
+        corporation = self.get_corporation(notification['corpID'])
+
+        return 'Character %s left corporation %s' % (character, corporation)
+
+    def new_corporation_ceo(self, notification):
+        old_ceo = self.get_character(notification['oldCeoID'])
+        new_ceo = self.get_character(notification['newCeoID'])
+        corporation = self.get_corporation(notification['corpID'])
+
+        return '%s has replaced %s as the new CEO of %s' % (new_ceo, old_ceo, corporation)
+
+    def corporation_vote_initiated(self, notification):
+        return "New corporation vote for '%s':\n\n%s" % (notification['subject'], notification['body'])
+
+    def corporation_vote_for_ceo_revoked(self, notification):
+        character = self.get_character(notification['charID'])
+        corporation = self.get_corporation(notification['corpID'])
+
+        return 'Corporation "%s" vote for new CEO has been revoked by %s' % (corporation, character)
+
+    def corporation_tax_changed(self, notification):
+        corporation = self.get_corporation(notification['corpID'])
+
+        return 'Tax changed from %.1f%% to %.1f%% for %s' % (notification['oldTaxRate'], notification['newTaxRate'], corporation)
+
+    def corporation_dividend_paid_out(self, notifications):
+        corporation = self.get_corporation(notification['corpID'])
+
+        return 'Corporation %s has paid out %.2f ISK in dividends' % (corporation, notification['payout'])
 
     @abc.abstractmethod
     def get_corporation(self, corporation_id):
