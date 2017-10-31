@@ -9,6 +9,7 @@ from reconbot.notificationprinters.slack import Slack
 from reconbot.notificationprinters.discord import Discord
 from reconbot.notificationprinters.esi.slack import Slack as ESISlack
 from reconbot.notificationprinters.esi.discord import Discord as ESIDiscord
+from reconbot.esi import ESI
 
 def notification_task(db, notification_options, api_queue, printer, notifier):
     MAX_NOTIFICATION_AGE_IN_SECONDS = 3600

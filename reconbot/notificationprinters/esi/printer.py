@@ -20,6 +20,7 @@ class Printer(object):
 
         types = {
             'AllWarDeclaredMsg': self.corporation_war_declared,
+            'CorpWarDeclaredMsg': self.corporation_war_declared,
             'EntosisCaptureStarted': self.entosis_capture_started,
             'SovCommandNodeEventStarted': self.sov_structure_command_nodes_decloaked,
             'SovStructureDestroyed': self.sov_structure_destroyed,
