@@ -92,7 +92,7 @@ class ESI:
             elif r.status_code >= 500 and r.status_code < 600 and attempt < max_attempts:
                 json = r.json()
                 if r.status_code == 500 and 'response' in json:
-                    return r.json()
+                    return json['response']
                 print('Delaying as server recovery attempt')
                 time.sleep(failed_request_delay)
                 continue
