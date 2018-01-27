@@ -54,6 +54,7 @@ class Printer(object):
             'notificationTypeMoonminingExtractionStarted': self.moon_extraction_started,
             'MoonminingExtractionFinished': self.moon_extraction_finished,
             'MoonminingLaserFired': self.moon_extraction_turned_into_belt,
+            'MoonminingAutomaticFracture': self.moon_extraction_autofractured,
             'CorpAllBillMsg': self.corporation_bill,
             'BillPaidCorpAllMsg': self.corporation_bill_paid,
             'CharAppAcceptMsg': self.character_application_accepted,
@@ -411,22 +412,32 @@ class Printer(object):
         moon = self.eve.get_moon(notification['moonID'])
         ready_time = self.eve_timestamp_to_date(notification['readyTime'])
         auto_destruct_time = self.eve_timestamp_to_date(notification['autoTime'])
+        structure_name = notification['structureName']
 
-        return 'Moon extraction started by %s in %s (%s) and will be ready on %s (or will auto-explode into a belt on %s)' % (started_by, system, moon['name'], ready_time, auto_destruct_time)
+        return 'Moon extraction started by %s in %s (%s, "%s") and will be ready on %s (or will auto-explode into a belt on %s)' % (started_by, system, moon['name'], structure_name, ready_time, auto_destruct_time)
 
     def moon_extraction_finished(self, notification):
         system = self.get_system(notification['solarSystemID'])
         moon = self.eve.get_moon(notification['moonID'])
         auto_destruct_time = self.eve_timestamp_to_date(notification['autoTime'])
+        structure_name = notification['structureName']
 
-        return 'Moon extraction has finished and is ready in %s (%s) to be exploded into a belt (or will auto-explode into one on %s)' % (system, moon['name'], auto_destruct_time)
+        return 'Moon extraction has finished and is ready in %s (%s, "%s") to be exploded into a belt (or will auto-explode into one on %s)' % (system, moon['name'], structure_name, auto_destruct_time)
 
     def moon_extraction_turned_into_belt(self, notification):
         fired_by = self.get_character(notification['firedBy'])
         system = self.get_system(notification['solarSystemID'])
         moon = self.eve.get_moon(notification['moonID'])
+        structure_name = notification['structureName']
 
-        return 'Moon laser has been fired by %s in %s (%s) and the belt is ready to be mined' % (fired_by, system, moon['name'])
+        return 'Moon laser has been fired by %s in %s (%s, "%s") and the belt is ready to be mined' % (fired_by, system, moon['name'], structure_name)
+
+    def moon_extraction_autofractured(self, notification):
+        system = self.get_system(notification['solarSystemID'])
+        moon = self.eve.get_moon(notification['moonID'])
+        structure_name = notification['structureName']
+
+        return 'Moon extraction in %s (%s, "%s") has autofractured into a belt and is ready to be mined' % (system, moon['name'], structure_name)
 
     def corporation_bill(self, notification):
         try:
