@@ -15,8 +15,6 @@ class Printer(object):
         return '[%s] %s' % (timestamp, text)
 
     def get_notification_text(self, notification):
-        text = yaml.load(notification['text'])
-        text['notification_timestamp'] = notification['timestamp']
 
         types = {
             'AllWarDeclaredMsg': self.corporation_war_declared,
@@ -31,6 +29,7 @@ class Printer(object):
             'StructureUnderAttack': self.citadel_attacked,
             'OwnershipTransferred': self.structure_transferred,
             'StructureOnline': self.citadel_onlined,
+            'StructureDestroyed': self.citadel_destroyed,
             'StructureFuelAlert': self.citadel_low_fuel,
             'StructureAnchoring': self.citadel_anchored,
             'StructureUnanchoring': self.citadel_unanchoring,
@@ -69,6 +68,8 @@ class Printer(object):
         }
 
         if notification['type'] in types:
+            text = yaml.load(notification['text'])
+            text['notification_timestamp'] = notification['timestamp']
             return types[notification['type']](text)
 
         return 'Unknown notification type for printing'
@@ -125,28 +126,24 @@ class Printer(object):
 
         return 'Ally %s joined the war to help %s starting %s' % (ally, defender, timestamp)
 
-    # 41
     def sov_claim_lost(self, notification):
         owner = self.get_corporation(notification['corpID'])
         system = self.get_system(notification['solarSystemID'])
 
         return 'SOV lost in %s by %s' % (system, owner)
 
-    # 43
     def sov_claim_acquired(self, notification):
         owner = self.get_corporation(notification['corpID'])
         system = self.get_system(notification['solarSystemID'])
 
         return 'SOV acquired in %s by %s' % (system, owner)
 
-    # 45
     def pos_anchoring_alert(self, notification):
         owner = self.get_corporation(notification['corpID'])
         moon = self.eve.get_moon(notification['moonID'])
 
         return 'New POS anchored in "%s" by %s' % (moon['name'], owner)
 
-    # 75
     def pos_attack(self, notification):
         moon = self.eve.get_moon(notification['moonID'])
         attacker = self.get_character(notification['aggressorID'])
@@ -172,7 +169,6 @@ class Printer(object):
             ', '.join(wants)
         )
 
-    # 79
     def station_conquered(self, notification):
         system = self.get_system(notification['solarSystemID'])
         old_owner = self.get_corporation(notification['oldOwnerID'])
@@ -180,7 +176,6 @@ class Printer(object):
 
         return "Station conquered from %s by %s in %s" % (old_owner, new_owner, system)
 
-    # 93 - poco attacked
     def customs_office_attacked(self, notification):
         attacker = self.get_character(notification['aggressorID'])
         planet = self.get_planet(notification['planetID'])
@@ -188,7 +183,6 @@ class Printer(object):
 
         return "\"%s\" POCO (%d%% shields) has been attacked by %s" % (planet, shields, attacker)
 
-    # 94 - poco reinforced
     def customs_office_reinforced(self, notification):
         attacker = self.get_character(notification['aggressorID'])
         planet = self.get_planet(notification['planetID'])
@@ -196,7 +190,6 @@ class Printer(object):
 
         return "\"%s\" POCO has been reinforced by %s (comes out of reinforce on \"%s\")" % (planet, attacker, timestamp)
 
-    # 95 - structure (not necessarily POCO) transferred
     def structure_transferred(self, notification):
         from_corporation = self.get_corporation(notification['fromCorporationLinkData'][-1])
         to_corporation = self.get_corporation(notification['toCorporationLinkData'][-1])
@@ -212,28 +205,24 @@ class Printer(object):
             character
         )
 
-    # 147 - entosis capture started
     def entosis_capture_started(self, notification):
         system = self.get_system(notification['solarSystemID'])
         structure = self.get_item(notification['structureTypeID'])
 
         return "Capturing of \"%s\" in %s has started" % (structure, system)
 
-    # 148 - entosis has enabled structure
     def entosis_enabled_structure(self, notification):
         system = self.get_system(notification['solarSystemID'])
         structure = self.get_item(notification['structureTypeID'])
 
         return "Structure \"%s\" in %s has been enabled" % (structure, system)
 
-    # 149 - entosis has disabled structure
     def entosis_disabled_structure(self, notification):
         system = self.get_system(notification['solarSystemID'])
         structure = self.get_item(notification['structureTypeID'])
 
         return "Structure \"%s\" in %s has been disabled" % (structure, system)
 
-    # 160 - SOV structure reinforced
     def sov_structure_reinforced(self, notification):
         system = self.get_system(notification['solarSystemID'])
         structure_type = self.get_campaign_event_type(notification['campaignEventType'])
@@ -241,21 +230,18 @@ class Printer(object):
 
         return "SOV structure \"%s\" in %s has been reinforced, nodes will decloak \"%s\"" % (structure_type, system, timestamp)
 
-    # 161 - SOV structure command nodes decloaked
     def sov_structure_command_nodes_decloaked(self, notification):
         system = self.get_system(notification['solarSystemID'])
         structure_type = self.get_campaign_event_type(notification['campaignEventType'])
 
         return "Command nodes for \"%s\" SOV structure in %s have decloaked" % (structure_type, system)
 
-    # 162 - SOV Structure has been destroyed
     def sov_structure_destroyed(self, notification):
         system = self.get_system(notification['solarSystemID'])
         structure_type = self.get_item(notification['structureTypeID'])
 
         return "SOV structure \"%s\" in %s has been destroyed" % (structure_type, system)
 
-    # 163 - SOV Structure has been freeported
     def sov_structure_freeported(self, notification):
         system = self.get_system(notification['solarSystemID'])
         structure_type = self.get_item(notification['structureTypeID'])
@@ -263,7 +249,6 @@ class Printer(object):
 
         return "SOV structure \"%s\" in %s has been freeported, exits freeport on \"%s\"" % (structure_type, system, timestamp)
 
-    # 181 - Citadel low fuel
     def citadel_low_fuel(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
@@ -274,7 +259,6 @@ class Printer(object):
             citadel_name,
             system)
 
-    # 182 - Citadel anchoring alert
     def citadel_anchored(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
@@ -300,7 +284,6 @@ class Printer(object):
             corp)
 
 
-    # 184 - Citadel attacked
     def citadel_attacked(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
@@ -316,7 +299,6 @@ class Printer(object):
             system,
             attacker)
 
-    # 185 - Citadel onlined
     def citadel_onlined(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
@@ -327,7 +309,6 @@ class Printer(object):
             citadel_name,
             system)
 
-    # 186 - Citadel reinforced
     def citadel_lost_shields(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
@@ -352,7 +333,6 @@ class Printer(object):
             system,
             timestamp)
 
-    # 188 - Citadel destroyed
     def citadel_destroyed(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
         system = self.get_system(notification['solarsystemID'])
@@ -365,7 +345,6 @@ class Printer(object):
             system,
             corp)
 
-    # 198 - Citadel ran out of fuel
     def citadel_out_of_fuel(self, notification):
         system = self.get_system(notification['solarsystemID'])
         citadel_type = self.get_item(notification['structureShowInfoData'][1])

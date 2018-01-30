@@ -18,4 +18,4 @@ Reconbot was intended to be used as a base for further customizations, or integr
 
 # Other notes
 
-Reconbot will try to evenly spread out checking API keys over the cache expiry window (which is 30 minutes), meaning that with 2 API keys an API key will be checked every ~15 minutes, which can be useful to detect alliance or corp-wide notifications a bit more quickly than every 30 minutes.
+Reconbot will try to evenly spread out checking API keys over the cache expiry window (which is 30 minutes), meaning that with 2 API keys in rotation an API key will be checked every ~15 minutes, which can be useful to detect alliance or corporation-wide notifications a bit more quickly than every 30 minutes.
