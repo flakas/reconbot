@@ -1,8 +1,6 @@
-EVELink==0.7.4
 nose==1.3.7
 PyYAML==3.11
 requests==2.10.0
 schedule==0.3.2
 slacker==0.9.24
 discord.py==0.16.10
-
