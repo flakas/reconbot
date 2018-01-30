@@ -75,6 +75,7 @@ class Printer(object):
         return 'Unknown notification type for printing'
 
     def corporation_war_declared(self, notification):
+        # May contain corporation or alliance IDs
         try:
             against_corp = self.get_corporation(notification['againstID'])
         except:
@@ -88,6 +89,7 @@ class Printer(object):
 
     def declare_war(self, notification):
         character = self.get_character(notification['charID'])
+        # May contain corporation or alliance IDs
         try:
             defender = self.get_corporation(notification['defenderID'])
         except:
@@ -101,6 +103,7 @@ class Printer(object):
 
 
     def corporation_war_invalidated(self, notification):
+        # May contain corporation or alliance IDs
         try:
             against_corp = self.get_corporation(notification['againstID'])
         except:
@@ -113,6 +116,7 @@ class Printer(object):
         return 'War has been invalidated to %s by %s' % (against_corp, declared_by_corp)
 
     def aggressor_ally_joined_war(self, notification):
+        # May contain corporation or alliance IDs
         try:
             defender = self.get_corporation(notification['defenderID'])
         except:
