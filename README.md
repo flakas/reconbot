@@ -14,8 +14,10 @@ Reconbot was intended to be used as a base for further customizations, or integr
 This tool is ready to be used with [Eve's ESI API](https://esi.tech.ccp.is/). You will need to register your application on [EVE Developers page](https://developers.eveonline.com/applications).
 
 When registering your EVE Application, please pick `Authentication & API Access` connection type, and make sure your application requests these permissions:
+
 - `esi-universe.read_structures.v1` - necessary to fetch names of any linked structures;
 - `esi-characters.read_notifications.v1` - necessary to fetch character level notifications.
+
 Take note of the `Client ID` and `Secret Key`, as they are necessary for establishing communication with ESI API.
 
 ## 2. Slack or Discord chat tools
@@ -25,7 +27,7 @@ To add a Slack integration, check out [this Slack documentation page on Bot User
 To add a Discord integration, check out [this Discord documentation page on Bot accounts](https://discordapp.com/developers/docs/topics/oauth2#bots).
 You will need to [create an application](https://discordapp.com/developers/applications/me#top) and add it to your discord server.
 See [this guide](https://github.com/Chikachi/DiscordIntegration/wiki/How-to-get-a-token-and-channel-ID-for-Discord) for more visual step-by-step instructions.
-You will need a `Token` for your Bot User, and `Channel ID` where to post messages in
+You will need a `Token` for your Bot User, and `Channel ID` where to post messages in.
 
 ## 3. Reconbot setup
 

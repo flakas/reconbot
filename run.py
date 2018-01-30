@@ -2,7 +2,7 @@ import schedule
 import time
 import sqlite3
 
-from reconbot.tasks import notification_task
+from reconbot.tasks import esi_notification_task
 from reconbot.notifiers.caching import CachingNotifier
 from reconbot.notifiers.slack import SlackNotifier
 from reconbot.notifiers.discord import DiscordNotifier
@@ -151,8 +151,7 @@ db_connection.row_factory = sqlite3.Row
 db = db_connection.cursor()
 
 def notifications_job_fc():
-    notification_task(
-        db,
+    esi_notification_task(
         eve_apis['fc-team']['notifications'],
         api_queue,
         'slack',
@@ -176,8 +175,7 @@ def notifications_job_fc():
     )
 
 def notifications_job_logistics():
-    notification_task(
-        db,
+    esi_notification_task(
         eve_apis['example-group']['notifications'],
         api_queue,
         'discord',
