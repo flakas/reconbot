@@ -94,5 +94,8 @@ As of writing this tool there is little documentation about the types of notific
 - CorpVoteCEORevokedMsg
 - CorpTaxChangeMsg
 - CorpDividendMsg
+- BountyClaimMsg
+- KillReportVictim
+- KillReportFinalBlow
 
 Do you have sample contents of currently unsupported notification types? Consider sharing them by creating an issue, or submit a Pull Request. Any help would be appreciated!

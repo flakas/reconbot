@@ -64,7 +64,10 @@ class Printer(object):
             'CorpVoteMsg': self.corporation_vote_initiated,
             'CorpVoteCEORevokedMsg': self.corporation_vote_for_ceo_revoked,
             'CorpTaxChangeMsg': self.corporation_tax_changed,
-            'CorpDividendMsg': self.corporation_dividend_paid_out
+            'CorpDividendMsg': self.corporation_dividend_paid_out,
+            'BountyClaimMsg': self.bounty_claimed,
+            'KillReportVictim': self.kill_report_victim,
+            'KillReportFinalBlow': self.kill_report_final_blow,
         }
 
         if notification['type'] in types:
@@ -495,10 +498,34 @@ class Printer(object):
 
         return 'Tax changed from %.1f%% to %.1f%% for %s' % (notification['oldTaxRate'], notification['newTaxRate'], corporation)
 
-    def corporation_dividend_paid_out(self, notifications):
+    def corporation_dividend_paid_out(self, notification):
         corporation = self.get_corporation(notification['corpID'])
 
         return 'Corporation %s has paid out %.2f ISK in dividends' % (corporation, notification['payout'])
+
+    def bounty_claimed(self, notification):
+        character = self.get_character(notification['charID'])
+        amount = notification['amount']
+
+        return 'A bounty of %.2f ISK has been claimed for killing %s' % (amount, character)
+
+    def kill_report_victim(self, notification):
+        kill_mail = self.get_killmail(
+            notification['killMailID'],
+            notification['killMailHash']
+        )
+        victim_ship_type = self.get_item(notification['victimShipTypeID'])
+
+        return 'Died in a(n) %s: %s' % (victim_ship_type, kill_mail)
+
+    def kill_report_final_blow(self, notification):
+        kill_mail = self.get_killmail(
+            notification['killMailID'],
+            notification['killMailHash']
+        )
+        victim_ship_type = self.get_item(notification['victimShipTypeID'])
+
+        return 'Got final blow on %s: %s' % (victim_ship_type, kill_mail)
 
     @abc.abstractmethod
     def get_corporation(self, corporation_id):
@@ -523,6 +550,10 @@ class Printer(object):
 
     @abc.abstractmethod
     def get_character(self, character_id):
+        return
+
+    @abc.abstractmethod
+    def get_killmail(self, kill_id):
         return
 
     def get_campaign_event_type(self, event_type):

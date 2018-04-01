@@ -105,6 +105,11 @@ class SlackTest(TestCase):
             'name': 'Standup Cloning Center I'
         }
 
+        self.atron = {
+            'id': 608,
+            'name': 'Atron'
+        }
+
         self.ichooseyou_hub_fortizar = {
             'structure_id': 1023164547009,
             'structure': {
@@ -125,6 +130,16 @@ class SlackTest(TestCase):
             }
         }
 
+        self.killmail_hash = 'a94a8fe5ccb19ba61c4c0873d391e987982fbbd3'
+        self.killmail = {
+            'killmail_id': 123,
+            'victim': {
+                'character_id': self.ccp_falcon['id'],
+                'ship_type_id': self.atron['id']
+            },
+            'solar_system_id': self.hed_gp['id']
+        }
+
         self.eve_mock.get_alliance.return_value = self.ccp_alliance
         self.eve_mock.get_corporation.return_value = self.ccp_corporation
         self.eve_mock.get_character.return_value = self.ccp_falcon
@@ -133,6 +148,7 @@ class SlackTest(TestCase):
         self.eve_mock.get_moon.return_value = self.hed_gp_moon
         self.eve_mock.get_item.return_value = self.amarr_control_tower
         self.eve_mock.get_structure.return_value = self.ichooseyou_hub_fortizar['structure']
+        self.eve_mock.get_killmail.return_value = self.killmail
 
     def test_get_alliance(self):
         self.assertEqual(
@@ -664,3 +680,51 @@ class SlackTest(TestCase):
         self.eve_mock.get_item.assert_any_call(self.astrahus['id'])
         self.eve_mock.get_item.assert_any_call(self.standup_cloning_center['id'])
 
+    def test_bounty_claimed(self):
+        notification = {
+            'type': 'BountyClaimMsg',
+            'timestamp': self.timestamp,
+            'text': yaml.dump({
+                'amount': 123.4567,
+                'charID': self.ccp_falcon['id']
+            })
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'A bounty of 123.46 ISK has been claimed for killing <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
+        )
+
+    def test_kill_report_victim(self):
+        self.eve_mock.get_item.return_value = self.atron
+        notification = {
+            'type': 'KillReportVictim',
+            'timestamp': self.timestamp,
+            'text': yaml.dump({
+                'killMailHash': self.killmail_hash,
+                'killMailID': self.killmail['killmail_id'],
+                'victimShipTypeID': self.killmail['victim']['ship_type_id'],
+            })
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Died in a(n) Atron: <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>)) lost a(n) Atron in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> (<https://zkillboard.com/kill/123/|Zkillboard>)'
+        )
+
+    def test_kill_report_final_blow(self):
+        self.eve_mock.get_item.return_value = self.atron
+        notification = {
+            'type': 'KillReportFinalBlow',
+            'timestamp': self.timestamp,
+            'text': yaml.dump({
+                'killMailHash': self.killmail_hash,
+                'killMailID': self.killmail['killmail_id'],
+                'victimShipTypeID': self.killmail['victim']['ship_type_id'],
+            })
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Got final blow on Atron: <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>)) lost a(n) Atron in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> (<https://zkillboard.com/kill/123/|Zkillboard>)'
+        )

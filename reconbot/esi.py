@@ -74,6 +74,12 @@ class ESI:
             '/latest/universe/types/%d/' % item_id
         )
 
+    @functools.lru_cache()
+    def get_killmail(self, killmail_id, killmail_hash):
+        return self.esi_get(
+            '/latest/killmails/%d/%s/' % (killmail_id, killmail_hash)
+        )
+
     def esi_get(self, endpoint, query={}):
         max_attempts = 3
         failed_request_delay = 10

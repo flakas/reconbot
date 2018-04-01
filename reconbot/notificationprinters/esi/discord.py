@@ -37,3 +37,11 @@ class Discord(Printer):
             character_id,
             self.get_corporation(character['corporation_id'])
         )
+
+    def get_killmail(self, killmail_id, killmail_hash):
+        killmail = self.eve.get_killmail(killmail_id, killmail_hash)
+        victim = self.get_character(killmail['victim']['character_id'])
+        ship = self.get_item(killmail['victim']['ship_type_id'])
+        system = self.get_system(killmail['solar_system_id'])
+
+        return '%s lost a %s in %s (https://zkillboard.com/kill/%d/)' % killmail__id
