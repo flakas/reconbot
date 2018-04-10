@@ -1,7 +1,5 @@
 import sys, traceback, datetime
 
-from reconbot.notificationprinters.slack import Slack
-from reconbot.notificationprinters.discord import Discord
 from reconbot.notificationprinters.esi.slack import Slack as ESISlack
 from reconbot.notificationprinters.esi.discord import Discord as ESIDiscord
 from reconbot.esi import ESI
