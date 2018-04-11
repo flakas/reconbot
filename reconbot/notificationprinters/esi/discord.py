@@ -15,7 +15,7 @@ class Discord(Printer):
 
     def get_alliance(self, alliance_id):
         alliance = self.eve.get_alliance(alliance_id)
-        return '**%s** (https://zkillboard.com/alliance/%d/)' % (alliance_id, alliance['name'])
+        return '**%s** (https://zkillboard.com/alliance/%d/)' % (alliance['name'], alliance_id)
 
     def get_system(self, system_id):
         system = self.eve.get_system(system_id)
@@ -44,4 +44,9 @@ class Discord(Printer):
         ship = self.get_item(killmail['victim']['ship_type_id'])
         system = self.get_system(killmail['solar_system_id'])
 
-        return '%s lost a %s in %s (https://zkillboard.com/kill/%d/)' % killmail__id
+        return '%s lost a(n) %s in %s (<https://zkillboard.com/kill/%d/)' % (
+            victim,
+            ship,
+            system,
+            killmail_id
+        )
