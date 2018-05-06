@@ -153,7 +153,7 @@ db = db_connection.cursor()
 def notifications_job_fc():
     esi_notification_task(
         eve_apis['fc-team']['notifications'],
-        api_queue,
+        api_queue_fc,
         'slack',
         CachingNotifier(
             SplitterNotifier([
@@ -177,7 +177,7 @@ def notifications_job_fc():
 def notifications_job_logistics():
     esi_notification_task(
         eve_apis['example-group']['notifications'],
-        api_queue,
+        api_queue_logistics,
         'discord',
         CachingNotifier(
             SplitterNotifier([
