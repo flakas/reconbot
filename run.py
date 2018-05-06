@@ -176,7 +176,7 @@ def notifications_job_fc():
 
 def notifications_job_logistics():
     esi_notification_task(
-        eve_apis['example-group']['notifications'],
+        eve_apis['logistics-team']['notifications'],
         api_queue_logistics,
         'discord',
         CachingNotifier(
