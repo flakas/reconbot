@@ -79,7 +79,7 @@ As of writing this tool there is little documentation about the types of notific
 - SovStructureSelfDestructRequested
 - SovStructureSelfDestructFinished
 - StationConquerMsg
-- notificationTypeMoonminingExtractionStarted
+- MoonminingExtractionStarted
 - MoonminingExtractionFinished
 - MoonminingLaserFired
 - MoonminingAutomaticFracture

@@ -50,7 +50,7 @@ class Printer(object):
             'SovStructureSelfDestructRequested': self.sov_structure_started_self_destructing,
             'SovStructureSelfDestructFinished': self.sov_structure_self_destructed,
             'StationConquerMsg': self.station_conquered,
-            'notificationTypeMoonminingExtractionStarted': self.moon_extraction_started,
+            'MoonminingExtractionStarted': self.moon_extraction_started,
             'MoonminingExtractionFinished': self.moon_extraction_finished,
             'MoonminingLaserFired': self.moon_extraction_turned_into_belt,
             'MoonminingAutomaticFracture': self.moon_extraction_autofractured,
@@ -68,6 +68,9 @@ class Printer(object):
             'BountyClaimMsg': self.bounty_claimed,
             'KillReportVictim': self.kill_report_victim,
             'KillReportFinalBlow': self.kill_report_final_blow,
+
+            # kept for older messages
+            'notificationTypeMoonminingExtractionStarted': self.moon_extraction_started,
         }
 
         if notification['type'] in types:
