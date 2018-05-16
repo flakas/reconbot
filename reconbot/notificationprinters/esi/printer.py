@@ -51,6 +51,7 @@ class Printer(object):
             'SovStructureSelfDestructFinished': self.sov_structure_self_destructed,
             'StationConquerMsg': self.station_conquered,
             'MoonminingExtractionStarted': self.moon_extraction_started,
+            'MoonminingExtractionCancelled': self.moon_extraction_cancelled,
             'MoonminingExtractionFinished': self.moon_extraction_finished,
             'MoonminingLaserFired': self.moon_extraction_turned_into_belt,
             'MoonminingAutomaticFracture': self.moon_extraction_autofractured,
@@ -404,6 +405,14 @@ class Printer(object):
         structure_name = notification['structureName']
 
         return 'Moon extraction started by %s in %s (%s, "%s") and will be ready on %s (or will auto-explode into a belt on %s)' % (started_by, system, moon['name'], structure_name, ready_time, auto_destruct_time)
+
+    def moon_extraction_cancelled(self, notification):
+        cancelled_by = self.get_character(notification['cancelledBy'])
+        system = self.get_system(notification['solarSystemID'])
+        moon = self.eve.get_moon(notification['moonID'])
+        structure_name = notification['structureName']
+
+        return 'Moon extraction cancelled by %s in %s (%s, "%s")' % (cancelled_by, system, moon['name'], structure_name)
 
     def moon_extraction_finished(self, notification):
         system = self.get_system(notification['solarSystemID'])
