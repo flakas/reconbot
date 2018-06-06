@@ -1,3 +1,37 @@
-machine:
-  python:
-    version: 3.5.1
+version: 2.0
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.5.5-jessie
+    working_directory: ~/repo
+    steps: # a collection of executable commands
+      - checkout # special step to check out source code to the working directory
+      - restore_cache: # restores saved dependency cache if the Branch key template or requirements.txt files have not changed since the previous run
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+      - run: # install and activate virtual environment with pip
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+      - save_cache: # special step to save dependency cache
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          paths:
+            - "venv"
+      - run:
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+            ./cc-test-reporter before-build
+      - run: # run tests
+          command: |
+            . venv/bin/activate
+            nosetests --with-xunit --xunit-file=unit.xml --with-coverage --cover-xml --cover-xml-file=coverage.xml
+      - store_artifacts: # special step to store test reports as artifacts
+          path: unit.xml
+          destination: tr1
+      - store_artifacts: # special step to store test reports as artifacts
+          path: coverage.xml
+          destination: tr1
+      - run:
+          command: |
+            ./cc-test-reporter after-build --exit-code $EXIT_CODE
