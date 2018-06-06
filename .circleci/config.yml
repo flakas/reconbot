@@ -25,7 +25,8 @@ jobs:
       - run: # run tests
           command: |
             . venv/bin/activate
-            nosetests --with-xunit --xunit-file=unit.xml --with-coverage --cover-xml --cover-xml-file=coverage.xml
+            nosetests --with-xunit --xunit-file=unit.xml
+            coverage run $(which nosetests) -o coverage.xml
       - store_artifacts: # special step to store test reports as artifacts
           path: unit.xml
           destination: tr1
@@ -34,4 +35,4 @@ jobs:
           destination: tr1
       - run:
           command: |
-            ./cc-test-reporter after-build --exit-code $EXIT_CODE
+            ./cc-test-reporter after-build --coverage-input-type coverage.py
