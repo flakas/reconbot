@@ -26,7 +26,10 @@ jobs:
           command: |
             . venv/bin/activate
             nosetests --with-xunit --xunit-file=unit.xml
-            coverage run $(which nosetests) -o coverage.xml
+      - run:
+          command: |
+            coverage run $(which nosetests)
+            coverage xml
       - store_artifacts: # special step to store test reports as artifacts
           path: unit.xml
           destination: tr1
