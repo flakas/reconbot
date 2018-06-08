@@ -7,6 +7,7 @@ from reconbot.notifiers.caching import CachingNotifier
 from reconbot.notifiers.slack import SlackNotifier
 from reconbot.notifiers.discord import DiscordNotifier
 from reconbot.notifiers.splitter import SplitterNotifier
+from reconbot.notifiers.filter import FilterNotifier
 from reconbot.apiqueue import ApiQueue
 from reconbot.esi import ESI
 from reconbot.sso import SSO
