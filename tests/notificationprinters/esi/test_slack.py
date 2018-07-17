@@ -231,6 +231,16 @@ class SlackTest(TestCase):
             self.hed_gp['id']
         )
 
+    def test_get_moon(self):
+        self.assertEqual(
+            self.printer.get_moon(self.hed_gp_moon['id']),
+            'HED-GP II - Moon 1'
+        )
+
+        self.eve_mock.get_moon.assert_called_once_with(
+            self.hed_gp_moon['id']
+        )
+
     def test_get_item(self):
         self.assertEqual(
             self.printer.get_item(self.amarr_control_tower['id']),

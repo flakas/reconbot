@@ -2,6 +2,8 @@ import abc
 import datetime
 import yaml
 
+from reconbot.notificationprinters.esi.formatter import Formatter
+
 class Printer(object):
     __metaclass__ = abc.ABCMeta
 
@@ -138,30 +140,21 @@ class Printer(object):
         return 'Ally %s joined the war to help %s starting %s' % (ally, defender, timestamp)
 
     def sov_claim_lost(self, notification):
-        owner = self.get_corporation(notification['corpID'])
-        system = self.get_system(notification['solarSystemID'])
-
-        return 'SOV lost in %s by %s' % (system, owner)
+        return 'SOV lost in {0:get_system(solarSystemID)} by {0:get_corporation(corpID)}'.format(Formatter(self, notification))
 
     def sov_claim_acquired(self, notification):
-        owner = self.get_corporation(notification['corpID'])
-        system = self.get_system(notification['solarSystemID'])
-
-        return 'SOV acquired in %s by %s' % (system, owner)
+        return 'SOV acquired in {0:get_system(solarSystemID)} by {0:get_corporation(corpID)}'.format(Formatter(self, notification))
 
     def pos_anchoring_alert(self, notification):
-        owner = self.get_corporation(notification['corpID'])
-        moon = self.eve.get_moon(notification['moonID'])
-
-        return 'New POS anchored in "%s" by %s' % (moon['name'], owner)
+        return 'New POS anchored in "{0:get_moon(moonID)}" by {0:get_corporation(corpID)}'.format(Formatter(self, notification))
 
     def pos_attack(self, notification):
-        moon = self.eve.get_moon(notification['moonID'])
+        moon = self.get_moon(notification['moonID'])
         attacker = self.get_character(notification['aggressorID'])
         item_type = self.get_item(notification['typeID'])
 
         return "%s POS \"%s\" (%.1f%% shield, %.1f%% armor, %.1f%% hull) under attack by %s" % (
-            moon['name'],
+            moon,
             item_type,
             notification['shieldValue']*100,
             notification['armorValue']*100,
@@ -170,22 +163,18 @@ class Printer(object):
         )
 
     def pos_fuel_alert(self, notification):
-        moon = self.eve.get_moon(notification['moonID'])
+        moon = self.get_moon(notification['moonID'])
         item_type = self.get_item(notification['typeID'])
         wants = map(lambda w: '%s: %d' % (self.get_item(w['typeID']), w['quantity']), notification['wants'])
 
         return "%s POS \"%s\" is low on fuel: %s" % (
-            moon['name'],
+            moon,
             item_type,
             ', '.join(wants)
         )
 
     def station_conquered(self, notification):
-        system = self.get_system(notification['solarSystemID'])
-        old_owner = self.get_corporation(notification['oldOwnerID'])
-        new_owner = self.get_corporation(notification['newOwnerID'])
-
-        return "Station conquered from %s by %s in %s" % (old_owner, new_owner, system)
+        return "Station conquered from {0:get_corporation(oldOwnerID)} by {0:get_corporation(newOwnerID)} in {0:get_system(solarSystemID)}".format(Formatter(self, notification))
 
     def customs_office_attacked(self, notification):
         attacker = self.get_character(notification['aggressorID'])
@@ -195,11 +184,7 @@ class Printer(object):
         return "\"%s\" POCO (%d%% shields) has been attacked by %s" % (planet, shields, attacker)
 
     def customs_office_reinforced(self, notification):
-        attacker = self.get_character(notification['aggressorID'])
-        planet = self.get_planet(notification['planetID'])
-        timestamp = self.eve_timestamp_to_date(notification['reinforceExitTime'])
-
-        return "\"%s\" POCO has been reinforced by %s (comes out of reinforce on \"%s\")" % (planet, attacker, timestamp)
+        return '"{0:get_planet(planetID)}" POCO has been reinforced by {0:get_character(aggressorID)} (comes out of reinforce on "{0:eve_timestamp_to_date(reinforceExitTime)}")'.format(Formatter(self, notification))
 
     def structure_transferred(self, notification):
         from_corporation = self.get_corporation(notification['fromCorporationLinkData'][-1])
@@ -217,48 +202,25 @@ class Printer(object):
         )
 
     def entosis_capture_started(self, notification):
-        system = self.get_system(notification['solarSystemID'])
-        structure = self.get_item(notification['structureTypeID'])
-
-        return "Capturing of \"%s\" in %s has started" % (structure, system)
+        return 'Capturing of "{0:get_item(structureTypeID)}" in {0:get_system(solarSystemID)} has started'.format(Formatter(self, notification))
 
     def entosis_enabled_structure(self, notification):
-        system = self.get_system(notification['solarSystemID'])
-        structure = self.get_item(notification['structureTypeID'])
-
-        return "Structure \"%s\" in %s has been enabled" % (structure, system)
+        return 'Structure "{0:get_item(structureTypeID)}" in {0:get_system(solarSystemID)} has been enabled'.format(Formatter(self, notification))
 
     def entosis_disabled_structure(self, notification):
-        system = self.get_system(notification['solarSystemID'])
-        structure = self.get_item(notification['structureTypeID'])
-
-        return "Structure \"%s\" in %s has been disabled" % (structure, system)
+        return 'Structure "{0:get_item(structureTypeID)}" in {0:get_system(solarSystemID)} has been disabled'.format(Formatter(self, notification))
 
     def sov_structure_reinforced(self, notification):
-        system = self.get_system(notification['solarSystemID'])
-        structure_type = self.get_campaign_event_type(notification['campaignEventType'])
-        timestamp = self.eve_timestamp_to_date(notification['decloakTime'])
-
-        return "SOV structure \"%s\" in %s has been reinforced, nodes will decloak \"%s\"" % (structure_type, system, timestamp)
+        return 'SOV structure "{0:get_campaign_event_type(campaignEventType)}" in {0:get_system(solarSystemID)} has been reinforced, nodes will decloak "{0:eve_timestamp_to_date(decloakTime)}"'.format(Formatter(self, notification))
 
     def sov_structure_command_nodes_decloaked(self, notification):
-        system = self.get_system(notification['solarSystemID'])
-        structure_type = self.get_campaign_event_type(notification['campaignEventType'])
-
-        return "Command nodes for \"%s\" SOV structure in %s have decloaked" % (structure_type, system)
+        return 'Command nodes for "{0:get_campaign_event_type(campaignEventType)}" SOV structure in {0:get_system(solarSystemID)} have decloaked'.format(Formatter(self, notification))
 
     def sov_structure_destroyed(self, notification):
-        system = self.get_system(notification['solarSystemID'])
-        structure_type = self.get_item(notification['structureTypeID'])
-
-        return "SOV structure \"%s\" in %s has been destroyed" % (structure_type, system)
+        return 'SOV structure "{0:get_item(structureTypeID)}" in {0:get_system(solarSystemID)} has been destroyed'.format(Formatter(self, notification))
 
     def sov_structure_freeported(self, notification):
-        system = self.get_system(notification['solarSystemID'])
-        structure_type = self.get_item(notification['structureTypeID'])
-        timestamp = self.eve_timestamp_to_date(notification['freeportexittime'])
-
-        return "SOV structure \"%s\" in %s has been freeported, exits freeport on \"%s\"" % (structure_type, system, timestamp)
+        return 'SOV structure "{0:get_item(structureTypeID)}" in {0:get_system(solarSystemID)} has been freeported, exits freeport on "{0:eve_timestamp_to_date(freeportexittime)}"'.format(Formatter(self, notification))
 
     def citadel_low_fuel(self, notification):
         citadel_type = self.get_item(notification['structureShowInfoData'][1])
@@ -369,73 +331,57 @@ class Printer(object):
             ', '.join(services))
 
     def structure_anchoring_alert(self, notification):
-        owner = self.get_corporation(notification['corpID'])
-        moon = self.eve.get_moon(notification['moonID'])
-        item_type = self.get_item(notification['typeID'])
-
-        return 'New structure (%s) anchored in "%s" by %s' % (item_type, moon['name'], owner)
+        return 'New structure ({0:get_item(typeID)}) anchored in "{0:get_moon(moonID)}" by {0:get_corporation(corpID)}'.format(Formatter(self, notification))
 
     def ihub_bill_about_to_expire(self, notification):
-        corp = self.get_corporation(notification['corpID'])
-        due_date = self.eve_timestamp_to_date(notification['dueDate'])
-        system = self.get_system(notification['solarSystemID'])
-
-        return 'IHUB bill to %s for system %s will expire %s' % (corp, system, due_date)
+        return 'IHUB bill to {0:get_corporation(corpID)} for system {0:get_system(solarSystemID)} will expire {0:eve_timestamp_to_date(dueDate)}'.format(Formatter(self, notification))
 
     def sov_structure_self_destructed(self, notification):
-        system = self.get_system(notification['solarSystemID'])
-        structure = self.get_item(notification['structureTypeID'])
-
-        return 'SOV structure "%s" has self destructed in %s' % (structure, system)
+        return 'SOV structure "{0:get_item(structureTypeID)}" has self destructed in {0:get_system(solarSystemID)}'.format(Formatter(self, notification))
 
     def sov_structure_started_self_destructing(self, notification):
-        character = self.get_character(notification['charID'])
-        end_time = self.eve_timestamp_to_date(notification['destructTime'])
-        system = self.get_system(notification['solarSystemID'])
-        item = self.get_item(notification['structureTypeID'])
-
-        return 'Self-destruction of "%s" SOV structure in %s has been requested by %s. Structure will self-destruct on "%s"' % (item, system, character, end_time)
+        return 'Self-destruction of "{0:get_item(structureTypeID)}" SOV structure in {0:get_system(solarSystemID)} has been requested by {0:get_character(charID)}. Structure will self-destruct on "{0:eve_timestamp_to_date(destructTime)}"'.format(Formatter(self, notification))
 
     def moon_extraction_started(self, notification):
         started_by = self.get_character(notification['startedBy'])
         system = self.get_system(notification['solarSystemID'])
-        moon = self.eve.get_moon(notification['moonID'])
+        moon = self.get_moon(notification['moonID'])
         ready_time = self.eve_timestamp_to_date(notification['readyTime'])
         auto_destruct_time = self.eve_timestamp_to_date(notification['autoTime'])
         structure_name = notification['structureName']
 
-        return 'Moon extraction started by %s in %s (%s, "%s") and will be ready on %s (or will auto-explode into a belt on %s)' % (started_by, system, moon['name'], structure_name, ready_time, auto_destruct_time)
+        return 'Moon extraction started by %s in %s (%s, "%s") and will be ready on %s (or will auto-explode into a belt on %s)' % (started_by, system, moon, structure_name, ready_time, auto_destruct_time)
 
     def moon_extraction_cancelled(self, notification):
         cancelled_by = self.get_character(notification['cancelledBy'])
         system = self.get_system(notification['solarSystemID'])
-        moon = self.eve.get_moon(notification['moonID'])
+        moon = self.get_moon(notification['moonID'])
         structure_name = notification['structureName']
 
-        return 'Moon extraction cancelled by %s in %s (%s, "%s")' % (cancelled_by, system, moon['name'], structure_name)
+        return 'Moon extraction cancelled by %s in %s (%s, "%s")' % (cancelled_by, system, moon, structure_name)
 
     def moon_extraction_finished(self, notification):
         system = self.get_system(notification['solarSystemID'])
-        moon = self.eve.get_moon(notification['moonID'])
+        moon = self.get_moon(notification['moonID'])
         auto_destruct_time = self.eve_timestamp_to_date(notification['autoTime'])
         structure_name = notification['structureName']
 
-        return 'Moon extraction has finished and is ready in %s (%s, "%s") to be exploded into a belt (or will auto-explode into one on %s)' % (system, moon['name'], structure_name, auto_destruct_time)
+        return 'Moon extraction has finished and is ready in %s (%s, "%s") to be exploded into a belt (or will auto-explode into one on %s)' % (system, moon, structure_name, auto_destruct_time)
 
     def moon_extraction_turned_into_belt(self, notification):
         fired_by = self.get_character(notification['firedBy'])
         system = self.get_system(notification['solarSystemID'])
-        moon = self.eve.get_moon(notification['moonID'])
+        moon = self.get_moon(notification['moonID'])
         structure_name = notification['structureName']
 
-        return 'Moon laser has been fired by %s in %s (%s, "%s") and the belt is ready to be mined' % (fired_by, system, moon['name'], structure_name)
+        return 'Moon laser has been fired by %s in %s (%s, "%s") and the belt is ready to be mined' % (fired_by, system, moon, structure_name)
 
     def moon_extraction_autofractured(self, notification):
         system = self.get_system(notification['solarSystemID'])
-        moon = self.eve.get_moon(notification['moonID'])
+        moon = self.get_moon(notification['moonID'])
         structure_name = notification['structureName']
 
-        return 'Moon extraction in %s (%s, "%s") has autofractured into a belt and is ready to be mined' % (system, moon['name'], structure_name)
+        return 'Moon extraction in %s (%s, "%s") has autofractured into a belt and is ready to be mined' % (system, moon, structure_name)
 
     def corporation_bill(self, notification):
         try:
@@ -472,38 +418,22 @@ class Printer(object):
         return "Character %s has applied to corporation %s. Application text:\n\n%s" % (character, corporation, notification['applicationText'])
 
     def character_application_withdrawn(self, notification):
-        character = self.get_character(notification['charID'])
-        corporation = self.get_corporation(notification['corpID'])
-
-        return 'Character %s application to corporation %s has been withdrawn' % (character, corporation)
+        return 'Character {0:get_character(charID)} application to corporation {0:get_corporation(corpID)} has been withdrawn'.format(Formatter(self, notification))
 
     def character_application_accepted(self, notification):
-        character = self.get_character(notification['charID'])
-        corporation = self.get_corporation(notification['corpID'])
-
-        return 'Character %s accepted to corporation %s' % (character, corporation)
+        return 'Character {0:get_character(charID)} accepted to corporation {0:get_corporation(corpID)}'.format(Formatter(self, notification))
 
     def character_left_corporation(self, notification):
-        character = self.get_character(notification['charID'])
-        corporation = self.get_corporation(notification['corpID'])
-
-        return 'Character %s left corporation %s' % (character, corporation)
+        return 'Character {0:get_character(charID)} left corporation {0:get_corporation(corpID)}'.format(Formatter(self, notification))
 
     def new_corporation_ceo(self, notification):
-        old_ceo = self.get_character(notification['oldCeoID'])
-        new_ceo = self.get_character(notification['newCeoID'])
-        corporation = self.get_corporation(notification['corpID'])
-
-        return '%s has replaced %s as the new CEO of %s' % (new_ceo, old_ceo, corporation)
+        return '{0:get_character(newCeoID)} has replaced {0:get_character(oldCeoID)} as the new CEO of {0:get_corporation(corpID)}'.format(Formatter(self, notification))
 
     def corporation_vote_initiated(self, notification):
         return "New corporation vote for '%s':\n\n%s" % (notification['subject'], notification['body'])
 
     def corporation_vote_for_ceo_revoked(self, notification):
-        character = self.get_character(notification['charID'])
-        corporation = self.get_corporation(notification['corpID'])
-
-        return 'Corporation "%s" vote for new CEO has been revoked by %s' % (corporation, character)
+        return 'Corporation "{0:get_corporation(corpID)}" vote for new CEO has been revoked by {0:get_character(charID)}'.format(Formatter(self, notification))
 
     def corporation_tax_changed(self, notification):
         corporation = self.get_corporation(notification['corpID'])
@@ -559,6 +489,10 @@ class Printer(object):
         planet = self.eve.get_planet(planet_id)
         system = self.get_system(planet['system_id'])
         return '%s in %s' % (planet['name'], system)
+
+    def get_moon(self, moon_id):
+        moon = self.eve.get_moon(moon_id)
+        return moon['name']
 
     @abc.abstractmethod
     def get_character(self, character_id):
