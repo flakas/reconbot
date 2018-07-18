@@ -84,60 +84,17 @@ class Printer(object):
         return 'Unknown notification type for printing'
 
     def corporation_war_declared(self, notification):
-        # May contain corporation or alliance IDs
-        try:
-            against_corp = self.get_corporation(notification['againstID'])
-        except:
-            against_corp = self.get_alliance(notification['againstID'])
-        try:
-            declared_by_corp = self.get_corporation(notification['declaredByID'])
-        except:
-            declared_by_corp = self.get_alliance(notification['declaredByID'])
-
-        return 'War has been declared to %s by %s' % (against_corp, declared_by_corp)
+        return 'War has been declared to {0:get_corporation_or_alliance(againstID)} by {0:get_corporation_or_alliance(declaredByID)}'.format(Formatter(self, notification))
 
     def declare_war(self, notification):
-        character = self.get_character(notification['charID'])
-        # May contain corporation or alliance IDs
-        try:
-            defender = self.get_corporation(notification['defenderID'])
-        except:
-            defender = self.get_alliance(notification['defenderID'])
-        try:
-            entity = self.get_corporation(notification['entityID'])
-        except:
-            entity = self.get_alliance(notification['entityID'])
-
-        return '%s from %s has declared war to %s' % (character, entity, defender)
+        return '{0:get_character(charID)} from {0:get_corporation_or_alliance(entityID)} has declared war to {0:get_corporation_or_alliance(defenderID)}'.format(Formatter(self, notification))
 
 
     def corporation_war_invalidated(self, notification):
-        # May contain corporation or alliance IDs
-        try:
-            against_corp = self.get_corporation(notification['againstID'])
-        except:
-            against_corp = self.get_alliance(notification['againstID'])
-        try:
-            declared_by_corp = self.get_corporation(notification['declaredByID'])
-        except:
-            declared_by_corp = self.get_alliance(notification['declaredByID'])
-
-        return 'War has been invalidated to %s by %s' % (against_corp, declared_by_corp)
+        return 'War has been invalidated to {0:get_corporation_or_alliance(againstID)} by {0:get_corporation_or_alliance(declaredByID)}'.format(Formatter(self, notification))
 
     def aggressor_ally_joined_war(self, notification):
-        # May contain corporation or alliance IDs
-        try:
-            defender = self.get_corporation(notification['defenderID'])
-        except:
-            defender = self.get_alliance(notification['defenderID'])
-        try:
-            ally = self.get_corporation(notification['allyID'])
-        except:
-            ally = self.get_alliance(notification['allyID'])
-
-        timestamp = self.eve_timestamp_to_date(notification['startTime'])
-
-        return 'Ally %s joined the war to help %s starting %s' % (ally, defender, timestamp)
+        return 'Ally {0:get_corporation_or_alliance(allyID)} joined the war to help {0:get_corporation_or_alliance(defenderID)} starting {0:eve_timestamp_to_date(startTime)}'.format(Formatter(self, notification))
 
     def sov_claim_lost(self, notification):
         return 'SOV lost in {0:get_system(solarSystemID)} by {0:get_corporation(corpID)}'.format(Formatter(self, notification))
@@ -384,14 +341,8 @@ class Printer(object):
         return 'Moon extraction in %s (%s, "%s") has autofractured into a belt and is ready to be mined' % (system, moon, structure_name)
 
     def corporation_bill(self, notification):
-        try:
-            debtor = self.get_corporation(notification['debtorID'])
-        except:
-            debtor = self.get_alliance(notification['debtorID'])
-        try:
-            creditor = self.get_corporation(notification['creditorID'])
-        except:
-            creditor = self.get_alliance(notification['creditorID'])
+        debtor = self.get_corporation_or_alliance(notification['debtorID'])
+        creditor = self.get_corporation_or_alliance(notification['creditorID'])
         current_timestamp = self.eve_timestamp_to_date(notification['currentDate'])
         due_timestamp = self.eve_timestamp_to_date(notification['dueDate'])
 
@@ -476,6 +427,12 @@ class Printer(object):
     @abc.abstractmethod
     def get_alliance(self, alliance_id):
         return
+
+    def get_corporation_or_alliance(self, entity_id):
+        try:
+            return self.get_corporation(entity_id)
+        except:
+            return self.get_alliance(entity_id)
 
     def get_item(self, item_id):
         item = self.eve.get_item(item_id)

@@ -187,6 +187,33 @@ class SlackTest(TestCase):
             self.ccp_alliance['id']
         )
 
+    def test_get_corporation_or_alliance_returns_corporation(self):
+        self.eve_mock.get_corporation.return_value = self.corp_without_alliance
+
+        self.assertEqual(
+            self.printer.get_corporation_or_alliance(self.corp_without_alliance['id']),
+            '<https://zkillboard.com/corporation/998877654/|Allianceless Corporation>'
+        )
+
+        self.eve_mock.get_corporation.assert_called_once_with(
+            self.corp_without_alliance['id']
+        )
+
+    def test_get_corporation_or_alliance_returns_alliance(self):
+        self.eve_mock.get_corporation.side_effect = Exception("Corporation not found")
+
+        self.assertEqual(
+            self.printer.get_corporation_or_alliance(self.ccp_alliance['id']),
+            '<https://zkillboard.com/alliance/434243723/|C C P Alliance>'
+        )
+
+        self.eve_mock.get_corporation.assert_called_once_with(
+            self.ccp_alliance['id']
+        )
+        self.eve_mock.get_alliance.assert_called_once_with(
+            self.ccp_alliance['id']
+        )
+
     def test_get_character(self):
         self.assertEqual(
             self.printer.get_character(self.ccp_falcon['id']),
