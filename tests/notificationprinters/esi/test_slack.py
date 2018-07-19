@@ -187,6 +187,33 @@ class SlackTest(TestCase):
             self.ccp_alliance['id']
         )
 
+    def test_get_corporation_or_alliance_returns_corporation(self):
+        self.eve_mock.get_corporation.return_value = self.corp_without_alliance
+
+        self.assertEqual(
+            self.printer.get_corporation_or_alliance(self.corp_without_alliance['id']),
+            '<https://zkillboard.com/corporation/998877654/|Allianceless Corporation>'
+        )
+
+        self.eve_mock.get_corporation.assert_called_once_with(
+            self.corp_without_alliance['id']
+        )
+
+    def test_get_corporation_or_alliance_returns_alliance(self):
+        self.eve_mock.get_corporation.side_effect = Exception("Corporation not found")
+
+        self.assertEqual(
+            self.printer.get_corporation_or_alliance(self.ccp_alliance['id']),
+            '<https://zkillboard.com/alliance/434243723/|C C P Alliance>'
+        )
+
+        self.eve_mock.get_corporation.assert_called_once_with(
+            self.ccp_alliance['id']
+        )
+        self.eve_mock.get_alliance.assert_called_once_with(
+            self.ccp_alliance['id']
+        )
+
     def test_get_character(self):
         self.assertEqual(
             self.printer.get_character(self.ccp_falcon['id']),
@@ -229,6 +256,16 @@ class SlackTest(TestCase):
 
         self.eve_mock.get_system.assert_called_once_with(
             self.hed_gp['id']
+        )
+
+    def test_get_moon(self):
+        self.assertEqual(
+            self.printer.get_moon(self.hed_gp_moon['id']),
+            'HED-GP II - Moon 1'
+        )
+
+        self.eve_mock.get_moon.assert_called_once_with(
+            self.hed_gp_moon['id']
         )
 
     def test_get_item(self):
@@ -393,7 +430,7 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            '"HED-GP I in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>" POCO (91% shields) has been attacked by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
+            '"HED-GP I in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>" POCO (91.7% shields) has been attacked by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
         )
 
     def test_poco_reinforce(self):
@@ -727,4 +764,74 @@ class SlackTest(TestCase):
         self.assertEqual(
             self.printer.get_notification_text(notification),
             'Got final blow on Atron: <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>)) lost a(n) Atron in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> (<https://zkillboard.com/kill/123/|Zkillboard>)'
+        )
+
+    def test_get_percentage(self):
+        self.assertEqual(self.printer.get_percentage(0.17), '17.0%')
+        self.assertEqual(self.printer.get_percentage(0.176), '17.6%')
+        self.assertEqual(self.printer.get_percentage(0.1768), '17.7%')
+
+        self.assertEqual(self.printer.get_percentage(17), '17.0%')
+        self.assertEqual(self.printer.get_percentage(17.6), '17.6%')
+        self.assertEqual(self.printer.get_percentage(17.68), '17.7%')
+
+    def test_get_string(self):
+        self.assertEqual(self.printer.get_string(123), '123')
+        self.assertEqual(self.printer.get_string(123.7), '123.7')
+
+
+    def test_get_corporation_from_link(self):
+        self.assertEqual(
+            self.printer.get_corporation_from_link(['showinfo', 2, self.ccp_corporation['id']]),
+            '<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>)'
+        )
+        self.eve_mock.get_corporation.assert_called_once_with(
+            self.ccp_corporation['id']
+        )
+
+    def test_get_structure_type_from_link(self):
+        self.eve_mock.get_item.return_value = self.astrahus
+        self.assertEqual(
+            self.printer.get_structure_type_from_link(['showinfo', self.astrahus['id'], 1021121988766]),
+            self.astrahus['name']
+        )
+        self.eve_mock.get_item.assert_called_once_with(
+            self.astrahus['id']
+        )
+
+    def test_get_system_from_link(self):
+        self.assertEqual(
+            self.printer.get_system_from_link(['showinfo', 5, self.hed_gp['id']]),
+            '<http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
+        )
+
+        self.eve_mock.get_system.assert_called_once_with(
+            self.hed_gp['id']
+        )
+
+    def test_get_character_from_link(self):
+        self.assertEqual(
+            self.printer.get_character_from_link(['showinfo', 1377, self.ccp_falcon['id']]),
+            '<https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
+        )
+
+        self.eve_mock.get_character.assert_called_once_with(
+            self.ccp_falcon['id']
+        )
+
+    def test_get_pos_wants(self):
+        self.assertEqual(
+            self.printer.get_pos_wants([{'typeID': self.amarr_control_tower['id'], 'quantity': 5}]),
+            'Amarr Control Tower: 5'
+        )
+
+    def test_get_citadel_services(self):
+        self.eve_mock.get_item.return_value = self.standup_cloning_center
+        self.assertEqual(
+            self.printer.get_citadel_services([self.standup_cloning_center['id']]),
+            self.standup_cloning_center['name']
+        )
+
+        self.eve_mock.get_item.assert_called_once_with(
+            self.standup_cloning_center['id']
         )
