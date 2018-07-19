@@ -23,6 +23,16 @@ class SlackTest(TestCase):
             self.notification['againstID']
         )
 
+    def test_calls_printer_method_with_multiple_given_args(self):
+        self.printer.get_killmail.return_value = 'Some Killmail'
+
+        'Erebus was killed {0:get_killmail(againstID, declaredByID)}'.format(self.formatter)
+
+        self.printer.get_killmail.assert_called_once_with(
+            self.notification['againstID'],
+            self.notification['declaredByID']
+        )
+
     def test_formats_text_with_given_arg(self):
         self.printer.corporation_or_alliance.return_value = 'Some Corp'
 

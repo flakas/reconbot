@@ -336,22 +336,10 @@ class Printer(object):
         return 'A bounty of {0:get_isk(amount)} has been claimed for killing {0:get_character(charID)}'.format(Formatter(self, notification))
 
     def kill_report_victim(self, notification):
-        kill_mail = self.get_killmail(
-            notification['killMailID'],
-            notification['killMailHash']
-        )
-        victim_ship_type = self.get_item(notification['victimShipTypeID'])
-
-        return 'Died in a(n) %s: %s' % (victim_ship_type, kill_mail)
+        return 'Died in a(n) {0:get_item(victimShipTypeID)}: {0:get_killmail(killMailID, killMailHash)}'.format(Formatter(self, notification))
 
     def kill_report_final_blow(self, notification):
-        kill_mail = self.get_killmail(
-            notification['killMailID'],
-            notification['killMailHash']
-        )
-        victim_ship_type = self.get_item(notification['victimShipTypeID'])
-
-        return 'Got final blow on %s: %s' % (victim_ship_type, kill_mail)
+        return 'Got final blow on {0:get_item(victimShipTypeID)}: {0:get_killmail(killMailID, killMailHash)}'.format(Formatter(self, notification))
 
     @abc.abstractmethod
     def get_corporation(self, corporation_id):
