@@ -109,15 +109,9 @@ class Printer(object):
         return '{0:get_moon(moonID)} POS "{0:get_item(typeID)}" ({0:get_percentage(shieldValue)} shield, {0:get_percentage(armorValue)} armor, {0:get_percentage(hullValue)} hull) under attack by {0:get_character(aggressorID)}'.format(Formatter(self, notification))
 
     def pos_fuel_alert(self, notification):
-        moon = self.get_moon(notification['moonID'])
-        item_type = self.get_item(notification['typeID'])
         wants = map(lambda w: '%s: %d' % (self.get_item(w['typeID']), w['quantity']), notification['wants'])
 
-        return "%s POS \"%s\" is low on fuel: %s" % (
-            moon,
-            item_type,
-            ', '.join(wants)
-        )
+        return '{0:get_moon(moonID)} POS "{0:get_item(typeID)}" is low on fuel: {wants}'.format(Formatter(self, notification), wants=', '.join(wants))
 
     def station_conquered(self, notification):
         return "Station conquered from {0:get_corporation(oldOwnerID)} by {0:get_corporation(newOwnerID)} in {0:get_system(solarSystemID)}".format(Formatter(self, notification))
@@ -129,19 +123,7 @@ class Printer(object):
         return '"{0:get_planet(planetID)}" POCO has been reinforced by {0:get_character(aggressorID)} (comes out of reinforce on "{0:eve_timestamp_to_date(reinforceExitTime)}")'.format(Formatter(self, notification))
 
     def structure_transferred(self, notification):
-        from_corporation = self.get_corporation(notification['fromCorporationLinkData'][-1])
-        to_corporation = self.get_corporation(notification['toCorporationLinkData'][-1])
-        structure = notification['structureName']
-        system = self.get_system(notification['solarSystemLinkData'][-1])
-        character = self.get_character(notification['characterLinkData'][-1])
-
-        return "\"%s\" structure in %s has been transferred from %s to %s by %s" % (
-            structure,
-            system,
-            from_corporation,
-            to_corporation,
-            character
-        )
+        return '"{0:get_string(structureName)}" structure in {0:get_system_from_link(solarSystemLinkData)} has been transferred from {0:get_corporation_from_link(fromCorporationLinkData)} to {0:get_corporation_from_link(toCorporationLinkData)} by {0:get_character_from_link(characterLinkData)}'.format(Formatter(self, notification))
 
     def entosis_capture_started(self, notification):
         return 'Capturing of "{0:get_item(structureTypeID)}" in {0:get_system(solarSystemID)} has started'.format(Formatter(self, notification))
@@ -165,112 +147,34 @@ class Printer(object):
         return 'SOV structure "{0:get_item(structureTypeID)}" in {0:get_system(solarSystemID)} has been freeported, exits freeport on "{0:eve_timestamp_to_date(freeportexittime)}"'.format(Formatter(self, notification))
 
     def citadel_low_fuel(self, notification):
-        citadel_type = self.get_item(notification['structureShowInfoData'][1])
-        system = self.get_system(notification['solarsystemID'])
-        citadel_name = self.get_structure_name(notification['structureID'])
-
-        return "Citadel (%s, \"%s\") low fuel alert in %s" % (
-            citadel_type,
-            citadel_name,
-            system)
+        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") low fuel alert in {0:get_system(solarsystemID)}'.format(Formatter(self, notification))
 
     def citadel_anchored(self, notification):
-        citadel_type = self.get_item(notification['structureShowInfoData'][1])
-        system = self.get_system(notification['solarsystemID'])
-        corp = self.get_corporation(notification['ownerCorpLinkData'][-1])
-        citadel_name = self.get_structure_name(notification['structureID'])
-
-        return "Citadel (%s, \"%s\") anchored in %s by %s" % (
-            citadel_type,
-            citadel_name,
-            system,
-            corp)
+        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") anchored in {0:get_system(solarsystemID)} by {0:get_corporation_from_link(ownerCorpLinkData)}'.format(Formatter(self, notification))
 
     def citadel_unanchoring(self, notification):
-        citadel_type = self.get_item(notification['structureShowInfoData'][1])
-        system = self.get_system(notification['solarsystemID'])
-        corp = self.get_corporation(notification['ownerCorpLinkData'][-1])
-        citadel_name = self.get_structure_name(notification['structureID'])
-
-        return "Citadel (%s, \"%s\") unanchoring in %s by %s" % (
-            citadel_type,
-            citadel_name,
-            system,
-            corp)
+        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") unanchoring in {0:get_system(solarsystemID)} by {0:get_corporation_from_link(ownerCorpLinkData)}'.format(Formatter(self, notification))
 
 
     def citadel_attacked(self, notification):
-        citadel_type = self.get_item(notification['structureShowInfoData'][1])
-        system = self.get_system(notification['solarsystemID'])
-        attacker = self.get_character(notification['charID'])
-        citadel_name = self.get_structure_name(notification['structureID'])
-
-        return "Citadel (%s, \"%s\") attacked (%.1f%% shield, %.1f%% armor, %.1f%% hull) in %s by %s" % (
-            citadel_type,
-            citadel_name,
-            notification['shieldPercentage'],
-            notification['armorPercentage'],
-            notification['hullPercentage'],
-            system,
-            attacker)
+        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") attacked ({0:get_percentage(shieldPercentage)} shield, {0:get_percentage(armorPercentage)} armor, {0:get_percentage(hullPercentage)} hull) in {0:get_system(solarsystemID)} by {0:get_character(charID)}'.format(Formatter(self, notification))
 
     def citadel_onlined(self, notification):
-        citadel_type = self.get_item(notification['structureShowInfoData'][1])
-        system = self.get_system(notification['solarsystemID'])
-        citadel_name = self.get_structure_name(notification['structureID'])
-
-        return "Citadel (%s, \"%s\") onlined in %s" % (
-            citadel_type,
-            citadel_name,
-            system)
+        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") onlined in {0:get_system(solarsystemID)}'.format(Formatter(self, notification))
 
     def citadel_lost_shields(self, notification):
-        citadel_type = self.get_item(notification['structureShowInfoData'][1])
-        system = self.get_system(notification['solarsystemID'])
-        citadel_name = self.get_structure_name(notification['structureID'])
-        timestamp = self.eve_duration_to_date(notification['notification_timestamp'], notification['timeLeft'])
-
-        return "Citadel (%s, \"%s\") lost shields in %s (comes out of reinforce on \"%s\")" % (
-            citadel_type,
-            citadel_name,
-            system,
-            timestamp)
+        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") lost shields in {0:get_system(solarsystemID)} (comes out of reinforce on "{0:eve_duration_to_date(notification_timestamp, timeLeft)}")'.format(Formatter(self, notification))
 
     def citadel_lost_armor(self, notification):
-        citadel_type = self.get_item(notification['structureShowInfoData'][1])
-        system = self.get_system(notification['solarsystemID'])
-        citadel_name = self.get_structure_name(notification['structureID'])
-        timestamp = self.eve_duration_to_date(notification['notification_timestamp'], notification['timeLeft'])
-
-        return "Citadel (%s, \"%s\") lost armor in %s (comes out of reinforce on \"%s\")" % (
-            citadel_type,
-            citadel_name,
-            system,
-            timestamp)
+        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") lost armor in {0:get_system(solarsystemID)} (comes out of reinforce on "{0:eve_duration_to_date(notification_timestamp, timeLeft)}")'.format(Formatter(self, notification))
 
     def citadel_destroyed(self, notification):
-        citadel_type = self.get_item(notification['structureShowInfoData'][1])
-        system = self.get_system(notification['solarsystemID'])
-        corp = self.get_corporation(notification['ownerCorpLinkData'][-1])
-        citadel_name = self.get_structure_name(notification['structureID'])
-
-        return "Citadel (%s, \"%s\") destroyed in %s owned by %s" % (
-            citadel_type,
-            citadel_name,
-            system,
-            corp)
+        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") destroyed in {0:get_system(solarsystemID)} owned by {0:get_corporation_from_link(ownerCorpLinkData)}'.format(Formatter(self, notification))
 
     def citadel_out_of_fuel(self, notification):
-        system = self.get_system(notification['solarsystemID'])
-        citadel_type = self.get_item(notification['structureShowInfoData'][1])
         services = map(lambda ID: self.get_item(ID), notification['listOfServiceModuleIDs'])
-        citadel_name = self.get_structure_name(notification['structureID'])
 
-        return "Citadel (%s, \"%s\") ran out of fuel in %s with services \"%s\"" % (
-            citadel_type,
-            citadel_name,
-            system,
-            ', '.join(services))
+        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") ran out of fuel in {0:get_system(solarsystemID)} with services "{services}"'.format(Formatter(self, notification), services=', '.join(services))
 
     def structure_anchoring_alert(self, notification):
         return 'New structure ({0:get_item(typeID)}) anchored in "{0:get_moon(moonID)}" by {0:get_corporation(corpID)}'.format(Formatter(self, notification))
@@ -420,10 +324,24 @@ class Printer(object):
         return timedelta.strftime('%Y-%m-%d %H:%M:%S')
 
     def get_percentage(self, value):
-        return '%.1f%%' % (value * 100)
+        if value <= 1:
+            value = value * 100
+        return '%.1f%%' % value
 
     def get_isk(self, isk):
         return '%.2f ISK' % isk
 
     def get_string(self, value):
         return str(value)
+
+    def get_corporation_from_link(self, show_info):
+        return self.get_corporation(show_info[-1])
+
+    def get_structure_type_from_link(self, show_info):
+        return self.get_item(show_info[1])
+
+    def get_system_from_link(self, show_info):
+        return self.get_system(show_info[-1])
+
+    def get_character_from_link(self, show_info):
+        return self.get_character(show_info[-1])

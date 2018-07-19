@@ -771,6 +771,50 @@ class SlackTest(TestCase):
         self.assertEqual(self.printer.get_percentage(0.176), '17.6%')
         self.assertEqual(self.printer.get_percentage(0.1768), '17.7%')
 
+        self.assertEqual(self.printer.get_percentage(17), '17.0%')
+        self.assertEqual(self.printer.get_percentage(17.6), '17.6%')
+        self.assertEqual(self.printer.get_percentage(17.68), '17.7%')
+
     def test_get_string(self):
         self.assertEqual(self.printer.get_string(123), '123')
         self.assertEqual(self.printer.get_string(123.7), '123.7')
+
+
+    def test_get_corporation_from_link(self):
+        self.assertEqual(
+            self.printer.get_corporation_from_link(['showinfo', 2, self.ccp_corporation['id']]),
+            '<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>)'
+        )
+        self.eve_mock.get_corporation.assert_called_once_with(
+            self.ccp_corporation['id']
+        )
+
+    def test_get_structure_type_from_link(self):
+        self.eve_mock.get_item.return_value = self.astrahus
+        self.assertEqual(
+            self.printer.get_structure_type_from_link(['showinfo', self.astrahus['id'], 1021121988766]),
+            self.astrahus['name']
+        )
+        self.eve_mock.get_item.assert_called_once_with(
+            self.astrahus['id']
+        )
+
+    def test_get_system_from_link(self):
+        self.assertEqual(
+            self.printer.get_system_from_link(['showinfo', 5, self.hed_gp['id']]),
+            '<http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
+        )
+
+        self.eve_mock.get_system.assert_called_once_with(
+            self.hed_gp['id']
+        )
+
+    def test_get_character_from_link(self):
+        self.assertEqual(
+            self.printer.get_character_from_link(['showinfo', 1377, self.ccp_falcon['id']]),
+            '<https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
+        )
+
+        self.eve_mock.get_character.assert_called_once_with(
+            self.ccp_falcon['id']
+        )
