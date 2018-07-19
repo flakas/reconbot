@@ -430,7 +430,7 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            '"HED-GP I in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>" POCO (91% shields) has been attacked by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
+            '"HED-GP I in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>" POCO (91.7% shields) has been attacked by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
         )
 
     def test_poco_reinforce(self):
@@ -765,3 +765,12 @@ class SlackTest(TestCase):
             self.printer.get_notification_text(notification),
             'Got final blow on Atron: <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>)) lost a(n) Atron in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> (<https://zkillboard.com/kill/123/|Zkillboard>)'
         )
+
+    def test_get_percentage(self):
+        self.assertEqual(self.printer.get_percentage(0.17), '17.0%')
+        self.assertEqual(self.printer.get_percentage(0.176), '17.6%')
+        self.assertEqual(self.printer.get_percentage(0.1768), '17.7%')
+
+    def test_get_string(self):
+        self.assertEqual(self.printer.get_string(123), '123')
+        self.assertEqual(self.printer.get_string(123.7), '123.7')
