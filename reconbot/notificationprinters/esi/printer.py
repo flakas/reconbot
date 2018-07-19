@@ -109,9 +109,7 @@ class Printer(object):
         return '{0:get_moon(moonID)} POS "{0:get_item(typeID)}" ({0:get_percentage(shieldValue)} shield, {0:get_percentage(armorValue)} armor, {0:get_percentage(hullValue)} hull) under attack by {0:get_character(aggressorID)}'.format(Formatter(self, notification))
 
     def pos_fuel_alert(self, notification):
-        wants = map(lambda w: '%s: %d' % (self.get_item(w['typeID']), w['quantity']), notification['wants'])
-
-        return '{0:get_moon(moonID)} POS "{0:get_item(typeID)}" is low on fuel: {wants}'.format(Formatter(self, notification), wants=', '.join(wants))
+        return '{0:get_moon(moonID)} POS "{0:get_item(typeID)}" is low on fuel: {0:get_pos_wants(wants)}'.format(Formatter(self, notification))
 
     def station_conquered(self, notification):
         return "Station conquered from {0:get_corporation(oldOwnerID)} by {0:get_corporation(newOwnerID)} in {0:get_system(solarSystemID)}".format(Formatter(self, notification))
@@ -172,9 +170,7 @@ class Printer(object):
         return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") destroyed in {0:get_system(solarsystemID)} owned by {0:get_corporation_from_link(ownerCorpLinkData)}'.format(Formatter(self, notification))
 
     def citadel_out_of_fuel(self, notification):
-        services = map(lambda ID: self.get_item(ID), notification['listOfServiceModuleIDs'])
-
-        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") ran out of fuel in {0:get_system(solarsystemID)} with services "{services}"'.format(Formatter(self, notification), services=', '.join(services))
+        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") ran out of fuel in {0:get_system(solarsystemID)} with services "{0:get_citadel_services(listOfServiceModuleIDs)}"'.format(Formatter(self, notification))
 
     def structure_anchoring_alert(self, notification):
         return 'New structure ({0:get_item(typeID)}) anchored in "{0:get_moon(moonID)}" by {0:get_corporation(corpID)}'.format(Formatter(self, notification))
@@ -345,3 +341,13 @@ class Printer(object):
 
     def get_character_from_link(self, show_info):
         return self.get_character(show_info[-1])
+
+    def get_pos_wants(self, wants):
+        wants = map(lambda w: '%s: %d' % (self.get_item(w['typeID']), w['quantity']), wants)
+
+        return ', '.join(wants)
+
+    def get_citadel_services(self, modules):
+        services = map(lambda ID: self.get_item(ID), modules)
+
+        return ', '.join(services)

@@ -818,3 +818,20 @@ class SlackTest(TestCase):
         self.eve_mock.get_character.assert_called_once_with(
             self.ccp_falcon['id']
         )
+
+    def test_get_pos_wants(self):
+        self.assertEqual(
+            self.printer.get_pos_wants([{'typeID': self.amarr_control_tower['id'], 'quantity': 5}]),
+            'Amarr Control Tower: 5'
+        )
+
+    def test_get_citadel_services(self):
+        self.eve_mock.get_item.return_value = self.standup_cloning_center
+        self.assertEqual(
+            self.printer.get_citadel_services([self.standup_cloning_center['id']]),
+            self.standup_cloning_center['name']
+        )
+
+        self.eve_mock.get_item.assert_called_once_with(
+            self.standup_cloning_center['id']
+        )
