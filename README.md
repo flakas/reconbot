@@ -28,7 +28,8 @@ To add a Slack integration, check out [this Slack documentation page on Bot User
 
 ### Discord
 
-_If you wish to use a Discord webhook:_
+__If you wish to use a Discord webhook:__
+
 Webhooks are the easiest way to integrate Reconbot with Discord. Simply follow [this Discord guide](https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks) to create a webhook for your channel.
 You should now have a URL like this:
 ```
@@ -36,7 +37,8 @@ https://discordapp.com/api/webhooks/496014874437332490/5783au24jzyEFIaWnfTvJn0gF
 ```
 Use it with `DiscordWebhookNotifier` as seen in `run.py` example.
 
-_If you wish to use a Discord bot user:_
+__If you wish to use a Discord bot user:__
+
 To add a Discord integration, check out [this Discord documentation page on Bot accounts](https://discordapp.com/developers/docs/topics/oauth2#bots).
 You will need to [create an application](https://discordapp.com/developers/applications/me#top) and add it to your discord server.
 See [this guide](https://github.com/Chikachi/DiscordIntegration/wiki/How-to-get-a-token-and-channel-ID-for-Discord) for more visual step-by-step instructions.
