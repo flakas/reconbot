@@ -6,6 +6,7 @@ from reconbot.tasks import esi_notification_task
 from reconbot.notifiers.caching import CachingNotifier
 from reconbot.notifiers.slack import SlackNotifier
 from reconbot.notifiers.discord import DiscordNotifier
+from reconbot.notifiers.discordwebhook import DiscordWebhookNotifier
 from reconbot.notifiers.splitter import SplitterNotifier
 from reconbot.notifiers.filter import FilterNotifier
 from reconbot.apiqueue import ApiQueue
@@ -32,6 +33,9 @@ discord = {
     'personal': {
         'token': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         'channel_id': 'xxxxxxxxxxxxxxxxxx'
+    },
+    'my-webhook': {
+        'url': 'https://discordapp.com/api/webhooks/496014874437332490/5783au24jzyEFIaWnfTvJn0gFzh5REEEE3ee3e3eNKeFee3We2cIe_6e7e36ugUj5zEm'
     }
 }
 
@@ -185,6 +189,9 @@ def notifications_job_logistics():
                 DiscordNotifier(
                     discord['personal']['token'],
                     discord['personal']['channel_id']
+                ),
+                DiscordWebhookNotifier(
+                    discord['my-webhook']['url']
                 )
             ]),
             duration=3600
