@@ -22,12 +22,26 @@ Take note of the `Client ID` and `Secret Key`, as they are necessary for establi
 
 ## 2. Slack or Discord chat tools
 
+### Slack
+
 To add a Slack integration, check out [this Slack documentation page on Bot Users](https://api.slack.com/bot-users) (or [create bot user for your workspace](https://my.slack.com/services/new/bot)). Take note of the API token.
 
+### Discord
+
+_If you wish to use a Discord webhook:_
+Webhooks are the easiest way to integrate Reconbot with Discord. Simply follow [this Discord guide](https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks) to create a webhook for your channel.
+You should now have a URL like this:
+```
+https://discordapp.com/api/webhooks/496014874437332490/5783au24jzyEFIaWnfTvJn0gFzh5REEEE3ee3e3eNKeFee3We2cIe_6e7e36ugUj5zEm
+```
+Use it with `DiscordWebhookNotifier` as seen in `run.py` example.
+
+_If you wish to use a Discord bot user:_
 To add a Discord integration, check out [this Discord documentation page on Bot accounts](https://discordapp.com/developers/docs/topics/oauth2#bots).
 You will need to [create an application](https://discordapp.com/developers/applications/me#top) and add it to your discord server.
 See [this guide](https://github.com/Chikachi/DiscordIntegration/wiki/How-to-get-a-token-and-channel-ID-for-Discord) for more visual step-by-step instructions.
 You will need a `Token` for your Bot User, and `Channel ID` where to post messages in.
+Use it with `DiscordNotifier` as seen in `run.py` example.
 
 ## 3. Reconbot setup
 
