@@ -33,6 +33,8 @@ class Printer(object):
             'StructureOnline': self.citadel_onlined,
             'StructureDestroyed': self.citadel_destroyed,
             'StructureFuelAlert': self.citadel_low_fuel,
+            'StructureWentLowPower': self.citadel_low_power,
+            'StructureWentHighPower': self.citadel_high_power,
             'StructureAnchoring': self.citadel_anchored,
             'StructureUnanchoring': self.citadel_unanchoring,
             'StructureServicesOffline': self.citadel_out_of_fuel,
@@ -71,6 +73,7 @@ class Printer(object):
             'BountyClaimMsg': self.bounty_claimed,
             'KillReportVictim': self.kill_report_victim,
             'KillReportFinalBlow': self.kill_report_final_blow,
+            'AllianceCapitalChanged': self.alliance_capital_changed,
 
             # kept for older messages
             'notificationTypeMoonminingExtractionStarted': self.moon_extraction_started,
@@ -150,12 +153,17 @@ class Printer(object):
     def citadel_low_fuel(self):
         return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") low fuel alert in {0:get_system(solarsystemID)}'
 
+    def citadel_low_power(self):
+        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") went into low power mode in {0:get_system(solarsystemID)}'
+
+    def citadel_high_power(self):
+        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") went into high power mode in {0:get_system(solarsystemID)}'
+
     def citadel_anchored(self):
         return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") anchored in {0:get_system(solarsystemID)} by {0:get_corporation_from_link(ownerCorpLinkData)}'
 
     def citadel_unanchoring(self):
         return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") unanchoring in {0:get_system(solarsystemID)} by {0:get_corporation_from_link(ownerCorpLinkData)}'
-
 
     def citadel_attacked(self):
         return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") attacked ({0:get_percentage(shieldPercentage)} shield, {0:get_percentage(armorPercentage)} armor, {0:get_percentage(hullPercentage)} hull) in {0:get_system(solarsystemID)} by {0:get_character(charID)}'
@@ -243,6 +251,9 @@ class Printer(object):
 
     def kill_report_final_blow(self):
         return 'Got final blow on {0:get_item(victimShipTypeID)}: {0:get_killmail(killMailID, killMailHash)}'
+
+    def alliance_capital_changed(self):
+        return 'Alliance capital system of {0:get_alliance(allianceID)} has changed to {0:get_system(solarSystemID)}'
 
     @abc.abstractmethod
     def get_corporation(self, corporation_id):

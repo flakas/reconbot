@@ -612,6 +612,45 @@ class SlackTest(TestCase):
             'Citadel (Astrahus, "Perimeter - IChooseYou Trade Hub") low fuel alert in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
         )
 
+    def test_citadel_low_power(self):
+        self.eve_mock.get_item.return_value = self.astrahus
+        notification = {
+            'type': 'StructureWentLowPower',
+            'timestamp': self.timestamp,
+            'text': yaml.dump({
+                'solarsystemID': self.hed_gp['id'],
+                'listOfTypesAndQty': [[149, 4247]],
+                'structureID': 1021121988766,
+                'structureShowInfoData': ['showinfo', self.astrahus['id'], 1021121988766],
+                'structureTypeID': self.astrahus['id'],
+            })
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Citadel (Astrahus, "Perimeter - IChooseYou Trade Hub") went into low power mode in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
+        )
+
+    def test_citadel_high_power(self):
+        self.eve_mock.get_item.return_value = self.astrahus
+        notification = {
+            'type': 'StructureWentHighPower',
+            'timestamp': self.timestamp,
+            'text': yaml.dump({
+                'solarsystemID': self.hed_gp['id'],
+                'listOfTypesAndQty': [[149, 4247]],
+                'structureID': 1021121988766,
+                'structureShowInfoData': ['showinfo', self.astrahus['id'], 1021121988766],
+                'structureTypeID': self.astrahus['id'],
+            })
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Citadel (Astrahus, "Perimeter - IChooseYou Trade Hub") went into high power mode in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
+        )
+
+
     def test_citadel_anchored(self):
         self.eve_mock.get_item.return_value = self.astrahus
         notification = {
@@ -765,6 +804,22 @@ class SlackTest(TestCase):
             self.printer.get_notification_text(notification),
             'Got final blow on Atron: <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>)) lost a(n) Atron in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> (<https://zkillboard.com/kill/123/|Zkillboard>)'
         )
+
+    def test_alliance_capital_changed(self):
+        notification = {
+            'type': 'AllianceCapitalChanged',
+            'timestamp': self.timestamp,
+            'text': yaml.dump({
+                 'allianceID': self.ccp_alliance['id'],
+                 'solarSystemID': self.hed_gp['id'],
+            })
+        }
+
+        self.assertEqual(
+            self.printer.get_notification_text(notification),
+            'Alliance capital system of <https://zkillboard.com/alliance/434243723/|C C P Alliance> has changed to <http://evemaps.dotlan.net/system/HED-GP|HED-GP>'
+        )
+
 
     def test_get_percentage(self):
         self.assertEqual(self.printer.get_percentage(0.17), '17.0%')
