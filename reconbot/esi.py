@@ -7,7 +7,7 @@ import time
 class ESI:
     def __init__(self, sso):
         self.sso = sso
-        self.esi_server = 'https://esi.tech.ccp.is'
+        self.esi_server = 'https://esi.evetech.net'
 
     @functools.lru_cache()
     def get_alliance(self, alliance_id):
