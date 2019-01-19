@@ -127,7 +127,7 @@ class Printer(object):
         return '"{0:get_planet(planetID)}" POCO has been reinforced by {0:get_character(aggressorID)} (comes out of reinforce on "{0:eve_timestamp_to_date(reinforceExitTime)}")'
 
     def structure_transferred(self):
-        return '"{0:get_string(structureName)}" structure in {0:get_system_from_link(solarSystemLinkData)} has been transferred from {0:get_corporation_from_link(fromCorporationLinkData)} to {0:get_corporation_from_link(toCorporationLinkData)} by {0:get_character_from_link(characterLinkData)}'
+        return '"{0:get_string(structureName)}" structure in {0:get_system(solarSystemID)} has been transferred from {0:get_corporation(oldOwnerCorpID)} to {0:get_corporation(newOwnerCorpID)} by {0:get_character(charID)}'
 
     def entosis_capture_started(self):
         return 'Capturing of "{0:get_item(structureTypeID)}" in {0:get_system(solarSystemID)} has started'

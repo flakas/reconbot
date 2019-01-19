@@ -449,23 +449,19 @@ class SlackTest(TestCase):
             '"HED-GP I in <http://evemaps.dotlan.net/system/HED-GP|HED-GP>" POCO has been reinforced by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>)) (comes out of reinforce on "2016-09-21 23:58:52")'
         )
 
-    # {'type': 'OwnershipTransferred', 'text': 'characterLinkData:\n- showinfo\n- 1376\n- 232864291\ncharacterName: Lyra Swift\nfromCorporationLinkData:\n- showinfo\n- 2\n- 98458764\nfromCorporationName: Zansha Industries\nsolarSystemLinkData:\n- showinfo\n- 5\n- 30001204\nsolarSystemName: YHN-3K\nstructureLinkData:\n- showinfo\n- 2233\n- 1019121377161\nstructureName: Customs Office (YHN-3K X)\ntoCorporationLinkData:\n- showinfo\n- 2\n- 98444656\ntoCorporationName: Brave Pos Boys\n', 'sender_type': 'corporation', 'notification_id': 726170275, 'sender_id': 1000125, 'timestamp': '2017-12-17T00:55:00Z'}
     def test_structure_transfered(self):
         self.eve_mock.get_corporation.side_effect = lambda ID: self.game_masters_corporation if ID == self.game_masters_corporation['id'] else self.ccp_corporation
         notification = {
             'type': 'OwnershipTransferred',
             'timestamp': self.timestamp,
             'text': yaml.dump({
-                'fromCorporationName': self.game_masters_corporation['name'],
-                'fromCorporationLinkData': ['showinfo', 2, self.game_masters_corporation['id']],
-                'toCorporationName': self.ccp_corporation['name'],
-                'toCorporationLinkData': ['showinfo', 2, self.ccp_corporation['id']],
+                'charID': self.ccp_falcon['id'],
+                'newOwnerCorpID': self.ccp_corporation['id'],
+                'oldOwnerCorpID': self.game_masters_corporation['id'],
+                'solarSystemID': self.hed_gp['id'],
+                'structureID': 1021121988766,
                 'structureName': 'HED-GP Freeport Citadel',
-                'structureLinkData': ['showinfo', self.astrahus['id'], 1021121988766],
-                'solarSystemName': self.hed_gp['name'],
-                'solarSystemLinkData': ['showinfo', 5, self.hed_gp['id']],
-                'characterName': self.ccp_falcon['name'],
-                'characterLinkData': ['showinfo', 1377, self.ccp_falcon['id']],
+                'structureTypeID': self.astrahus['id'],
             })
         }
 
