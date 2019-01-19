@@ -450,6 +450,7 @@ class SlackTest(TestCase):
         )
 
     def test_structure_transfered(self):
+        self.eve_mock.get_item.return_value = self.astrahus
         self.eve_mock.get_corporation.side_effect = lambda ID: self.game_masters_corporation if ID == self.game_masters_corporation['id'] else self.ccp_corporation
         notification = {
             'type': 'OwnershipTransferred',
@@ -467,7 +468,7 @@ class SlackTest(TestCase):
 
         self.assertEqual(
             self.printer.get_notification_text(notification),
-            '"HED-GP Freeport Citadel" structure in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> has been transferred from <https://zkillboard.com/corporation/216121397/|Game Masters> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>) to <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>) by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
+            'Astrahus HED-GP Freeport Citadel structure in <http://evemaps.dotlan.net/system/HED-GP|HED-GP> has been transferred from <https://zkillboard.com/corporation/216121397/|Game Masters> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>) to <https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>) by <https://zkillboard.com/character/92532650/|CCP Falcon> (<https://zkillboard.com/corporation/98356193/|C C P Alliance Holding> (<https://zkillboard.com/alliance/434243723/|C C P Alliance>))'
         )
 
     def test_entosis_capture_started(self):
