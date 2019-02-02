@@ -22,6 +22,9 @@ class Discord(Printer):
         return '**%s** (http://evemaps.dotlan.net/system/%s)' % (system['name'], system['name'])
 
     def get_character(self, character_id):
+        if not character_id:
+            return 'Unknown character'
+
         try:
             character = self.eve.get_character(character_id)
         except requests.HTTPError as ex:
