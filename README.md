@@ -48,13 +48,12 @@ Use it with `DiscordNotifier` as seen in `run.py` example.
 ## 3. Reconbot setup
 
 1. Clone this repository
-2. Execute `download_dump.sh`, which will download the latest Static Data Export from [Fuzzwork Enterprises](https://www.fuzzwork.co.uk/) and will store it in the current directory
-3. Create a virtualenv environment: `virtualenv -p python3 venv`
-4. Activate the virtualenv environment: `source venv/bin/activate`
-5. Install Python depdendencies: `pip install -r requirements.txt`
-6. Modify `run.py` with your EVE API keys, key groups and Slack/Discord accounts/channels.
+2. Create a virtualenv environment: `virtualenv -p python3 venv`
+3. Activate the virtualenv environment: `source venv/bin/activate`. This will isolate reconbot's dependencies from the rest of your system's dependencies.
+4. Install Python depdendencies: `pip install -r requirements.txt`
+5. Modify `run.py` with your EVE API keys, key groups and Slack/Discord accounts/channels.
   `whitelist` should contain notification types you're interested in (or `None` to allow all supported types), and `characters` should contain entries for API keys of individual characters.
-7. Execute `python run.py` and wait for notifications to arrive! After the character gets a notification in-game, `reconbot` may take up to 10 minutes to detect the notification.
+6. Execute `python run.py` and wait for notifications to arrive! After the character gets a notification in-game, `reconbot` may take up to 10 minutes to detect the notification.
 
 # Other notes
 

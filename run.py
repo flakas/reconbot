@@ -15,8 +15,6 @@ from reconbot.sso import SSO
 
 # Configuration
 
-db_file = 'datadump/sqlite-latest.sqlite'
-
 # ESI notification endpoint cache timer in minutes
 notification_caching_timer = 10
 
@@ -122,10 +120,6 @@ def api_to_sso(api):
 
 api_queue_fc = ApiQueue(list(map(api_to_sso, eve_apis['fc-team']['characters'].values())))
 api_queue_logistics = ApiQueue(list(map(api_to_sso, eve_apis['logistics-team']['characters'].values())))
-
-db_connection = sqlite3.connect(db_file)
-db_connection.row_factory = sqlite3.Row
-db = db_connection.cursor()
 
 def notifications_job_fc():
     esi_notification_task(
