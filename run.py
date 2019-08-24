@@ -35,7 +35,7 @@ discord = {
         'channel_id': 'xxxxxxxxxxxxxxxxxx'
     },
     'my-webhook': {
-        'url': 'https://discordapp.com/api/webhooks/496014874437332490/5783au24jzyEFIaWnfTvJn0gFzh5REEEE3ee3e3eNKeFee3We2cIe_6e7e36ugUj5zEm'
+        'url': 'https://discordapp.com/api/webhooks/xxxxxxxxxxxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     }
 }
 
@@ -53,35 +53,7 @@ sso_app = {
 eve_apis = {
     'fc-team': {
         'notifications': {
-            'whitelist': [
-                'EntosisCaptureStarted',
-                'SovCommandNodeEventStarted',
-                'SovStructureDestroyed',
-                'SovStructureReinforced',
-                'StructureUnderAttack',
-                'OwnershipTransferred',
-                'StructureOnline',
-                'StructureFuelAlert',
-                'StructureAnchoring',
-                'StructureServicesOffline',
-                'StructureLostShields',
-                'StructureLostArmor',
-                'TowerAlertMsg',
-                'StationServiceEnabled',
-                'StationServiceDisabled',
-                'OrbitalReinforced',
-                'OrbitalAttacked',
-                'SovAllClaimAquiredMsg',
-                'SovStationEnteredFreeport',
-                'AllAnchoringMsg',
-                'SovAllClaimLostMsg',
-                'SovStructureSelfDestructRequested',
-                'SovStructureSelfDestructFinished',
-                'StationConquerMsg',
-                'notificationTypeMoonminingExtractionStarted',
-                'MoonminingExtractionFinished',
-                'MoonminingLaserFired',
-            ],
+            'whitelist': None, # allow all notification types
         },
         'characters': {
             'ccp-example-1': {
@@ -98,7 +70,7 @@ eve_apis = {
     },
     'logistics-team': {
         'notifications': {
-            'whitelist': [
+            'whitelist': [ # Allow only specified notification types
                 'SovStructureDestroyed',
                 'SovStructureReinforced',
                 'StructureUnderAttack',
@@ -199,8 +171,16 @@ def notifications_job_logistics():
     )
 
 
-schedule.every(notification_caching_timer/len(eve_apis['fc-team']['characters'])).minutes.do(notifications_job_fc)
-schedule.every(notification_caching_timer/len(eve_apis['logistics-team']['characters'])).minutes.do(notifications_job_logistics)
+def run_and_schedule(characters, notifications_job):
+    """
+    Runs a job immediately to avoid having to wait for the delay to end,
+    and schedules the job to be run continuously.
+    """
+    notifications_job()
+    schedule.every(notification_caching_timer/len(characters)).minutes.do(notifications_job)
+
+run_and_schedule(eve_apis['fc-team']['characters'], notifications_job_fc)
+run_and_schedule(eve_apis['logistics-team']['characters'], notifications_job_logistics)
 
 while True:
     schedule.run_pending()

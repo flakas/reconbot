@@ -14,7 +14,7 @@ def esi_notification_task(notification_options, api_queue, printer, notifier):
 
         notifications = esi.get_new_notifications(max_age=MAX_NOTIFICATION_AGE_IN_SECONDS)
 
-        if notification_options['whitelist']:
+        if 'whitelist' in notification_options and type(notification_options['whitelist']) == 'list':
             notifications = [notification for notification in notifications if notification['type'] in notification_options['whitelist']]
 
         if printer == 'discord':

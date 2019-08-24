@@ -37,7 +37,7 @@ https://discordapp.com/api/webhooks/496014874437332490/5783au24jzyEFIaWnfTvJn0gF
 ```
 Use it with `DiscordWebhookNotifier` as seen in `run.py` example.
 
-__If you wish to use a Discord bot user:__
+__If you wish to use a Discord bot user:__ (not recommended)
 
 To add a Discord integration, check out [this Discord documentation page on Bot accounts](https://discordapp.com/developers/docs/topics/oauth2#bots).
 You will need to [create an application](https://discordapp.com/developers/applications/me#top) and add it to your discord server.
@@ -49,10 +49,12 @@ Use it with `DiscordNotifier` as seen in `run.py` example.
 
 1. Clone this repository
 2. Execute `download_dump.sh`, which will download the latest Static Data Export from [Fuzzwork Enterprises](https://www.fuzzwork.co.uk/) and will store it in the current directory
-3. Modify `run.py` with your EVE API keys, key groups and Slack/Discord accounts/channels.
-  `whitelist` will contain notification types you're interested in, and `characters` should contain entries for API keys of individual characters.
-4. Install Python dependencies with `pip install -r requirements.txt`
-5. Execute `python run.py` and wait for notifications to arrive!
+3. Create a virtualenv environment: `virtualenv -p python3 venv`
+4. Activate the virtualenv environment: `source venv/bin/activate`
+5. Install Python depdendencies: `pip install -r requirements.txt`
+6. Modify `run.py` with your EVE API keys, key groups and Slack/Discord accounts/channels.
+  `whitelist` should contain notification types you're interested in (or `None` to allow all supported types), and `characters` should contain entries for API keys of individual characters.
+7. Execute `python run.py` and wait for notifications to arrive! After the character gets a notification in-game, `reconbot` may take up to 10 minutes to detect the notification.
 
 # Other notes
 
