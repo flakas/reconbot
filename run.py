@@ -110,6 +110,37 @@ eve_apis = {
     }
 }
 
+my_slack_channels = CachingNotifier(
+    SplitterNotifier([
+        SlackNotifier(
+            slack_apis['example']['api_key'],
+            slack_apis['example']['username'],
+            '#fc',
+            'online'
+        ),
+        SlackNotifier(
+            slack_apis['example']['api_key'],
+            slack_apis['example']['username'],
+            '#logistics',
+            'all'
+        )
+    ]),
+    duration=3600
+)
+
+my_discord_channels = CachingNotifier(
+    SplitterNotifier([
+        DiscordNotifier(
+            discord['personal']['token'],
+            discord['personal']['channel_id']
+        ),
+        DiscordWebhookNotifier(
+            discord['my-webhook']['url']
+        )
+    ]),
+    duration=3600
+)
+
 def api_to_sso(api):
     return SSO(
         sso_app['client_id'],
@@ -126,23 +157,7 @@ def notifications_job_fc():
         eve_apis['fc-team']['notifications'],
         api_queue_fc,
         'slack',
-        CachingNotifier(
-            SplitterNotifier([
-                SlackNotifier(
-                    slack_apis['example']['api_key'],
-                    slack_apis['example']['username'],
-                    '#fc',
-                    'online'
-                ),
-                SlackNotifier(
-                    slack_apis['example']['api_key'],
-                    slack_apis['example']['username'],
-                    '#logistics',
-                    'all'
-                )
-            ]),
-            duration=3600
-        )
+        my_slack_channels
     )
 
 def notifications_job_logistics():
@@ -150,18 +165,7 @@ def notifications_job_logistics():
         eve_apis['logistics-team']['notifications'],
         api_queue_logistics,
         'discord',
-        CachingNotifier(
-            SplitterNotifier([
-                DiscordNotifier(
-                    discord['personal']['token'],
-                    discord['personal']['channel_id']
-                ),
-                DiscordWebhookNotifier(
-                    discord['my-webhook']['url']
-                )
-            ]),
-            duration=3600
-        )
+        my_discord_channels
     )
 
 
