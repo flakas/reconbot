@@ -5,7 +5,7 @@ from reconbot.notificationprinters.esi.discord import Discord as ESIDiscord
 from reconbot.esi import ESI
 
 def esi_notification_task(notification_options, api_queue, printer, notifier):
-    MAX_NOTIFICATION_AGE_IN_SECONDS = 3600
+    MAX_NOTIFICATION_AGE_IN_SECONDS = 86400*7
 
     try:
         sso = api_queue.get()
@@ -14,7 +14,7 @@ def esi_notification_task(notification_options, api_queue, printer, notifier):
 
         notifications = esi.get_new_notifications(max_age=MAX_NOTIFICATION_AGE_IN_SECONDS)
 
-        if 'whitelist' in notification_options and type(notification_options['whitelist']) == 'list':
+        if 'whitelist' in notification_options and type(notification_options['whitelist']) is list:
             notifications = [notification for notification in notifications if notification['type'] in notification_options['whitelist']]
 
         if printer == 'discord':
