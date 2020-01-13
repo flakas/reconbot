@@ -18,7 +18,9 @@ When registering your EVE Application, please pick `Authentication & API Access`
 - `esi-universe.read_structures.v1` - necessary to fetch names of any linked structures;
 - `esi-characters.read_notifications.v1` - necessary to fetch character level notifications.
 
-Take note of the `Client ID` and `Secret Key`, as they are necessary for establishing communication with ESI API.
+Reconbot does not provide a way to authenticate an account to an application, so you will need to do so via some other means. First two sections of Fuzzysteve's guide on [Using ESI with Google Sheets](https://www.fuzzwork.co.uk/2017/03/14/using-esi-google-sheets/) explain how to do that via [Postman](https://www.getpostman.com/).
+
+When registering the application take note of the `Client ID` and `Secret Key`, as they are necessary for Reconbot to establish communication with ESI API.
 
 ## 2. Slack or Discord chat tools
 
