@@ -11,33 +11,23 @@ from reconbot.apiqueue import ApiQueue
 from reconbot.esi import ESI
 from reconbot.sso import SSO
 
-# Configuration
-
-# ESI notification endpoint cache timer in minutes
 notification_caching_timer = 10
 
-# Discord bot integration API key and channel
 discord = {
     'my-webhook': {
-        'url': 'https://discordapp.com/api/webhooks/xxxxxxxxxxxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+        'url': ''
     }
 }
 
-# Eve online SSO application Client ID and Secret Key, used to get access
-# tokens for ESI API. Get them on:
-# https://developers.eveonline.com/applications
 sso_app = {
-    'client_id': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-    'secret_key': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    'client_id': '',
+    'secret_key': ''
 }
 
-# A dictionary of API key groups.
-# Get refresh tokens for your characters by following Fuzzwork's guide:
-# https://www.fuzzwork.co.uk/2017/03/14/using-esi-google-sheets/
 eve_apis = {
     'logistics-team': {
         'notifications': {
-            'whitelist': [ # Allow only specified notification types
+            'whitelist': [
                 'SovStructureDestroyed',
                 'SovStructureReinforced',
                 'StructureUnderAttack',
@@ -96,7 +86,6 @@ def api_to_sso(api):
         api['character_id']
     )
 
-api_queue_fc = ApiQueue(list(map(api_to_sso, eve_apis['fc-team']['characters'].values())))
 api_queue_logistics = ApiQueue(list(map(api_to_sso, eve_apis['logistics-team']['characters'].values())))
 
 def notifications_job_logistics():
