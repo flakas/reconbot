@@ -10,7 +10,18 @@ from reconbot.apiqueue import ApiQueue
 from reconbot.esi import ESI
 from reconbot.sso import SSO
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 notification_caching_timer = 10
+
+webhook_url = os.getenv("WEBHOOK_URL")
+sso_app_client_id = os.getenv("SSO_APP_CLIENT_ID")
+sso_app_secret_key = os.getenv("SSO_APP_SECRET_KEY")
+character_one_id = os.getenv("CHARACTER_ONE_ID")
+character_one_token = os.getenv("CHARACTER_ONE_TOKEN")
 
 discord = {
     'webhook': {
