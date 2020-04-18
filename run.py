@@ -1,6 +1,7 @@
 import schedule
 import time
 import sqlite3
+import os
 
 from reconbot.tasks import esi_notification_task
 from reconbot.notifiers.caching import CachingNotifier
@@ -11,7 +12,6 @@ from reconbot.esi import ESI
 from reconbot.sso import SSO
 
 from dotenv import load_dotenv
-import os
 
 load_dotenv()
 
@@ -20,18 +20,19 @@ notification_caching_timer = 10
 webhook_url = os.getenv("WEBHOOK_URL")
 sso_app_client_id = os.getenv("SSO_APP_CLIENT_ID")
 sso_app_secret_key = os.getenv("SSO_APP_SECRET_KEY")
+character_one_name = os.getenv("CHARACTER_ONE_NAME")
 character_one_id = os.getenv("CHARACTER_ONE_ID")
 character_one_token = os.getenv("CHARACTER_ONE_TOKEN")
 
 discord = {
     'webhook': {
-        'url': ''
+        'url': webhook_url
     }
 }
 
 sso_app = {
-    'client_id': '',
-    'secret_key': ''
+    'client_id': sso_app_client_id,
+    'secret_key': sso_app_secret_key
 }
 
 eve_apis = {
@@ -65,15 +66,10 @@ eve_apis = {
             ],
         },
         'characters': {
-            'ccp-example-3': {
-                'character_name': 'CCP Example 3',
-                'character_id': 55555555,
-                'refresh_token': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-            },
-            'ccp-example-4': {
-                'character_name': 'CCP Example 4',
-                'character_id': 77777777,
-                'refresh_token': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+            character_one_name: {
+                'character_name': character_one_name,
+                'character_id': character_one_id,
+                'refresh_token': character_one_token
             },
         },
     }
