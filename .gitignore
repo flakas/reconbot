@@ -4,3 +4,4 @@ datadump/*
 coverage.xml
 unit.xml
 .coverage
+.env
