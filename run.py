@@ -4,7 +4,6 @@ import sqlite3
 
 from reconbot.tasks import esi_notification_task
 from reconbot.notifiers.caching import CachingNotifier
-from reconbot.notifiers.slack import SlackNotifier
 from reconbot.notifiers.discord import DiscordNotifier
 from reconbot.notifiers.discordwebhook import DiscordWebhookNotifier
 from reconbot.notifiers.splitter import SplitterNotifier
@@ -17,14 +16,6 @@ from reconbot.sso import SSO
 
 # ESI notification endpoint cache timer in minutes
 notification_caching_timer = 10
-
-# Slack bot integration API key
-slack_apis = {
-  'example': {
-    'api_key': 'xxxx-xxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxx',
-    'username': 'reconbot',
-  },
-}
 
 # Discord bot integration API key and channel
 discord = {
@@ -110,24 +101,6 @@ eve_apis = {
     }
 }
 
-my_slack_channels = CachingNotifier(
-    SplitterNotifier([
-        SlackNotifier(
-            slack_apis['example']['api_key'],
-            slack_apis['example']['username'],
-            '#fc',
-            'online'
-        ),
-        SlackNotifier(
-            slack_apis['example']['api_key'],
-            slack_apis['example']['username'],
-            '#logistics',
-            'all'
-        )
-    ]),
-    duration=3600
-)
-
 my_discord_channels = CachingNotifier(
     SplitterNotifier([
         DiscordNotifier(
@@ -152,14 +125,6 @@ def api_to_sso(api):
 api_queue_fc = ApiQueue(list(map(api_to_sso, eve_apis['fc-team']['characters'].values())))
 api_queue_logistics = ApiQueue(list(map(api_to_sso, eve_apis['logistics-team']['characters'].values())))
 
-def notifications_job_fc():
-    esi_notification_task(
-        eve_apis['fc-team']['notifications'],
-        api_queue_fc,
-        'slack',
-        my_slack_channels
-    )
-
 def notifications_job_logistics():
     esi_notification_task(
         eve_apis['logistics-team']['notifications'],
@@ -170,10 +135,6 @@ def notifications_job_logistics():
 
 
 def run_and_schedule(characters, notifications_job):
-    """
-    Runs a job immediately to avoid having to wait for the delay to end,
-    and schedules the job to be run continuously.
-    """
     notifications_job()
     schedule.every(notification_caching_timer/len(characters)).minutes.do(notifications_job)
 
