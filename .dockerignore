@@ -1,0 +1,7 @@
+venv
+*.pyc
+datadump/*
+coverage.xml
+unit.xml
+.coverage
+.env
