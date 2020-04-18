@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
+from dotenv import load_dotenv
+load_dotenv()
 
 setup(
     name='Reconbot',
