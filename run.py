@@ -1,6 +1,5 @@
 import schedule
 import time
-import sqlite3
 import os
 
 from reconbot.tasks import esi_notification_task
