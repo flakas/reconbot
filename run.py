@@ -4,7 +4,6 @@ import sqlite3
 
 from reconbot.tasks import esi_notification_task
 from reconbot.notifiers.caching import CachingNotifier
-from reconbot.notifiers.discord import DiscordNotifier
 from reconbot.notifiers.discordwebhook import DiscordWebhookNotifier
 from reconbot.notifiers.splitter import SplitterNotifier
 from reconbot.notifiers.filter import FilterNotifier
@@ -19,10 +18,6 @@ notification_caching_timer = 10
 
 # Discord bot integration API key and channel
 discord = {
-    'personal': {
-        'token': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        'channel_id': 'xxxxxxxxxxxxxxxxxx'
-    },
     'my-webhook': {
         'url': 'https://discordapp.com/api/webhooks/xxxxxxxxxxxxxxxxxx/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
     }
@@ -40,23 +35,6 @@ sso_app = {
 # Get refresh tokens for your characters by following Fuzzwork's guide:
 # https://www.fuzzwork.co.uk/2017/03/14/using-esi-google-sheets/
 eve_apis = {
-    'fc-team': {
-        'notifications': {
-            'whitelist': None, # allow all notification types
-        },
-        'characters': {
-            'ccp-example-1': {
-                'character_name': 'CCP Example',
-                'character_id': 11111111,
-                'refresh_token': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-            },
-            'ccp-example-2': {
-                'character_name': 'CCP Example 2',
-                'character_id': 33333333,
-                'refresh_token': 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
-            },
-        },
-    },
     'logistics-team': {
         'notifications': {
             'whitelist': [ # Allow only specified notification types
@@ -103,10 +81,6 @@ eve_apis = {
 
 my_discord_channels = CachingNotifier(
     SplitterNotifier([
-        DiscordNotifier(
-            discord['personal']['token'],
-            discord['personal']['channel_id']
-        ),
         DiscordWebhookNotifier(
             discord['my-webhook']['url']
         )
