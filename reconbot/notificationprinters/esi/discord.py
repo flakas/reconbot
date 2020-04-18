@@ -6,7 +6,7 @@ class Discord(Printer):
 
     def get_corporation(self, corporation_id):
         corporation = self.eve.get_corporation(corporation_id)
-        result = '**%s** (https://zkillboard.com/corporation/%d/)' % (corporation['name'], corporation_id)
+        result = '**%s** (<https://zkillboard.com/corporation/%d/>)' % (corporation['name'], corporation_id)
 
         if 'alliance_id' in corporation:
             result = '%s (%s)' % (result, self.get_alliance(corporation['alliance_id']))
@@ -15,11 +15,11 @@ class Discord(Printer):
 
     def get_alliance(self, alliance_id):
         alliance = self.eve.get_alliance(alliance_id)
-        return '**%s** (https://zkillboard.com/alliance/%d/)' % (alliance['name'], alliance_id)
+        return '**%s** (<https://zkillboard.com/alliance/%d/>' % (alliance['name'], alliance_id)
 
     def get_system(self, system_id):
         system = self.eve.get_system(system_id)
-        return '**%s** (http://evemaps.dotlan.net/system/%s)' % (system['name'], system['name'])
+        return '**%s** (<http://evemaps.dotlan.net/system/%s>)' % (system['name'], system['name'])
 
     def get_character(self, character_id):
         if not character_id:
@@ -35,7 +35,7 @@ class Discord(Printer):
             else:
                 raise
 
-        return '**%s** (https://zkillboard.com/character/%d/) (%s)' % (
+        return '**%s** (<https://zkillboard.com/character/%d/>) (%s)' % (
             character['name'],
             character_id,
             self.get_corporation(character['corporation_id'])
@@ -47,7 +47,7 @@ class Discord(Printer):
         ship = self.get_item(killmail['victim']['ship_type_id'])
         system = self.get_system(killmail['solar_system_id'])
 
-        return '%s lost a(n) %s in %s (<https://zkillboard.com/kill/%d/)' % (
+        return '%s lost a(n) %s in %s (<https://zkillboard.com/kill/%d/>)' % (
             victim,
             ship,
             system,

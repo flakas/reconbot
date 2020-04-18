@@ -13,8 +13,9 @@ class Printer(object):
     def transform(self, notification):
         text = self.get_notification_text(notification)
         timestamp = self.timestamp_to_date(notification['timestamp'])
+        notify = '@here'
 
-        return '[%s] %s' % (timestamp, text)
+        return '%s - [%s] %s' % (notify, timestamp, text)
 
     def get_notification_text(self, notification):
 
@@ -84,7 +85,7 @@ class Printer(object):
             text['notification_timestamp'] = notification['timestamp']
             template = types[notification['type']]()
 
-            rendered_notification = template.format(Formatter(self, text))
+            rendered_notification = template.format(Formatter(self, text)) 
             return rendered_notification
 
         return 'Unknown notification type for printing'
