@@ -10,7 +10,6 @@ from reconbot.notifiers.splitter import SplitterNotifier
 from reconbot.apiqueue import ApiQueue
 from reconbot.esi import ESI
 from reconbot.sso import SSO
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -76,7 +75,7 @@ my_discord_channels = CachingNotifier(
             discord['webhook']['url']
         )
     ]),
-    duration=3600
+    duration=7200
 )
 
 def api_to_sso(api):
