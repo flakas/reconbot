@@ -97,12 +97,10 @@ def notifications_job_logistics():
         my_discord_channels
     )
 
-
 def run_and_schedule(characters, notifications_job):
     notifications_job()
     schedule.every(notification_caching_timer/len(characters)).minutes.do(notifications_job)
 
-run_and_schedule(eve_apis['fc-team']['characters'], notifications_job_fc)
 run_and_schedule(eve_apis['logistics-team']['characters'], notifications_job_logistics)
 
 while True:
