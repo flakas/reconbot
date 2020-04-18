@@ -6,7 +6,6 @@ from reconbot.tasks import esi_notification_task
 from reconbot.notifiers.caching import CachingNotifier
 from reconbot.notifiers.discordwebhook import DiscordWebhookNotifier
 from reconbot.notifiers.splitter import SplitterNotifier
-from reconbot.notifiers.filter import FilterNotifier
 from reconbot.apiqueue import ApiQueue
 from reconbot.esi import ESI
 from reconbot.sso import SSO
@@ -14,7 +13,7 @@ from reconbot.sso import SSO
 notification_caching_timer = 10
 
 discord = {
-    'my-webhook': {
+    'webhook': {
         'url': ''
     }
 }
@@ -72,7 +71,7 @@ eve_apis = {
 my_discord_channels = CachingNotifier(
     SplitterNotifier([
         DiscordWebhookNotifier(
-            discord['my-webhook']['url']
+            discord['webhook']['url']
         )
     ]),
     duration=3600
