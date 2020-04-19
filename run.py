@@ -74,7 +74,7 @@ my_discord_channels = CachingNotifier(
             discord['webhook']['url']
         )
     ]),
-    duration=1800
+    duration=7200
 )
 
 def api_to_sso(api):
