@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-notification_caching_timer = 10
+notification_caching_timer = 5
 
 webhook_url = os.getenv("WEBHOOK_URL")
 sso_app_client_id = os.getenv("SSO_APP_CLIENT_ID")

@@ -1,6 +1,5 @@
 import sys, traceback, datetime
 
-from reconbot.notificationprinters.esi.slack import Slack as ESISlack
 from reconbot.notificationprinters.esi.discord import Discord as ESIDiscord
 from reconbot.esi import ESI
 
@@ -16,11 +15,8 @@ def esi_notification_task(notification_options, api_queue, printer, notifier):
 
         if 'whitelist' in notification_options and type(notification_options['whitelist']) is list:
             notifications = [notification for notification in notifications if notification['type'] in notification_options['whitelist']]
-
-        if printer == 'discord':
-            printer = ESIDiscord(esi)
-        else:
-            printer = ESISlack(esi)
+        
+        printer = ESIDiscord(esi)        
 
         messages = map(lambda text: printer.transform(text), notifications)
 
