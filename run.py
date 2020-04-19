@@ -13,14 +13,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-notification_caching_timer = 5
-
-webhook_url = os.getenv("WEBHOOK_URL")
-sso_app_client_id = os.getenv("SSO_APP_CLIENT_ID")
-sso_app_secret_key = os.getenv("SSO_APP_SECRET_KEY")
-character_one_name = os.getenv("CHARACTER_ONE_NAME")
-character_one_id = int(os.getenv("CHARACTER_ONE_ID"))
-character_one_token = os.getenv("CHARACTER_ONE_TOKEN")
+notification_caching_timer  = 5
+webhook_url                 = os.getenv("WEBHOOK_URL")
+sso_app_client_id           = os.getenv("SSO_APP_CLIENT_ID")
+sso_app_secret_key          = os.getenv("SSO_APP_SECRET_KEY")
+character_one_name          = os.getenv("CHARACTER_ONE_NAME")
+character_one_id            = int(os.getenv("CHARACTER_ONE_ID"))
+character_one_token         = os.getenv("CHARACTER_ONE_TOKEN")
 
 discord = {
     'webhook': {
