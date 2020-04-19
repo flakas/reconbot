@@ -1,5 +1,4 @@
 venv
-*.pyc
 datadump/*
 coverage.xml
 unit.xml
