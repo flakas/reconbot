@@ -5,7 +5,7 @@ from reconbot.notificationprinters.esi.discord import Discord as ESIDiscord
 from reconbot.esi import ESI
 
 def esi_notification_task(notification_options, api_queue, printer, notifier):
-    MAX_NOTIFICATION_AGE_IN_SECONDS = 3600
+    MAX_NOTIFICATION_AGE_IN_SECONDS = 6300
 
     try:
         sso = api_queue.get()
