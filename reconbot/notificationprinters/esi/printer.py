@@ -15,7 +15,7 @@ class Printer(object):
         timestamp = self.timestamp_to_date(notification['timestamp'])
         ping = ':scream:'
 
-        return '%s [%s] %s' % (ping, timestamp, text)
+        return '%s `[%s]` %s' % (ping, timestamp, text)
 
     def get_notification_text(self, notification):
 
@@ -152,7 +152,7 @@ class Printer(object):
         return 'SOV structure "{0:get_item(structureTypeID)}" in {0:get_system(solarSystemID)} has been freeported, exits freeport on "{0:eve_timestamp_to_date(freeportexittime)}"'
 
     def citadel_low_fuel(self):
-        return 'Citadel (**{0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}"**) low fuel alert in {0:get_system(solarsystemID)}'
+        return 'Citadel (__**{0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}"**__) low fuel alert in {0:get_system(solarsystemID)}'
 
     def citadel_low_power(self):
         return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") went into low power mode in {0:get_system(solarsystemID)}'
@@ -167,7 +167,7 @@ class Printer(object):
         return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") unanchoring in {0:get_system(solarsystemID)} by {0:get_corporation_from_link(ownerCorpLinkData)}'
 
     def citadel_attacked(self):
-        return 'Citadel (**{0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}"**) attacked ({0:get_percentage(shieldPercentage)} shield, {0:get_percentage(armorPercentage)} armor, {0:get_percentage(hullPercentage)} hull) in {0:get_system(solarsystemID)} by {0:get_character(charID)}'
+        return 'Citadel (__**{0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}"**__) attacked ({0:get_percentage(shieldPercentage)} shield, {0:get_percentage(armorPercentage)} armor, {0:get_percentage(hullPercentage)} hull) in {0:get_system(solarsystemID)} by {0:get_character(charID)}'
 
     def citadel_onlined(self):
         return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") onlined in {0:get_system(solarsystemID)}'
@@ -182,7 +182,7 @@ class Printer(object):
         return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") destroyed in {0:get_system(solarsystemID)} owned by {0:get_corporation_from_link(ownerCorpLinkData)}'
 
     def citadel_out_of_fuel(self):
-        return 'Citadel ({0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}") ran out of fuel in {0:get_system(solarsystemID)} with services "{0:get_citadel_services(listOfServiceModuleIDs)}"'
+        return 'Citadel (__**{0:get_structure_type_from_link(structureShowInfoData)}, "{0:get_structure_name(structureID)}"**__) ran out of fuel in {0:get_system(solarsystemID)} with services "{0:get_citadel_services(listOfServiceModuleIDs)}"'
 
     def structure_anchoring_alert(self):
         return 'New structure ({0:get_item(typeID)}) anchored in "{0:get_moon(moonID)}" by {0:get_corporation(corpID)}'
